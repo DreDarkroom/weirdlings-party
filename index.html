@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Weirdlings: Road to Kerry's Party</title>
+<meta name="description" content="A 2D platform shooter for the Weirdlings Anti-AI Tribe. Get to Kerry Queenslayer's birthday party before Dee forgets the DJ set. Cake countdown included.">
+<meta name="theme-color" content="#12091f">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-screen="title">
+<!-- Dee, if you are reading the source: the cake is cut in <span class="cd"></span> -->
+<div id="cdBanner" role="timer" aria-live="off">
+  <span class="cdLabel">🎂 DJ CAKE CUT IN</span><b class="cd cdBig">--:--:--</b>
+  <span id="cdMsg"></span>
+</div>
+
+<div id="stage">
+  <canvas id="game" aria-label="Game"></canvas>
+  <div id="bubble" role="status"></div>
+  <div id="toast" role="status"></div>
+  <div id="rotate">↻ Rotate your device to landscape for the best view<br><small>Cake in <span class="cd"></span></small></div>
+
+  <div id="hudBtns">
+    <button id="btnPause" aria-label="Pause">⏸</button>
+    <button id="btnFull" aria-label="Fullscreen">⛶</button>
+  </div>
+
+  <div id="touch" aria-hidden="true">
+    <div class="pad"><button data-act="left">◀</button><button data-act="right">▶</button></div>
+    <div class="acts"><button data-act="fire" class="b">FIRE</button><button data-act="jump" class="a">JUMP</button></div>
+  </div>
+
+  <!-- ===== TITLE ===== -->
+  <section id="title" class="screen">
+    <div class="panel">
+      <p class="eyebrow">The Weirdlings Anti-AI Tribe present</p>
+      <h1>Road to <span>Kerry's Party</span></h1>
+      <p class="big">Get to the birthday. Cut the cake. Don't let Dee forget.</p>
+      <div class="menu">
+        <button id="btnPlay" class="primary">▶ New Game</button>
+        <button id="btnContinue">Level Select</button>
+        <button data-go="select">Choose Your Weirdling</button>
+        <button data-go="dj">🎧 DJ Booth</button>
+        <button data-go="settings">Settings</button>
+        <button data-go="help">Help &amp; Controls</button>
+        <button data-go="credits">Credits</button>
+        <button id="btnIcs">📅 Add party to calendar</button>
+      </div>
+      <p class="foot">Keyboard · Gamepad · Touch · Works on PC, Mac, phone &amp; tablet</p>
+    </div>
+  </section>
+
+  <!-- ===== SELECT ===== -->
+  <section id="select" class="screen" hidden>
+    <div class="panel wide">
+      <h2>Choose your Weirdling</h2>
+      <div id="chars" class="cards"></div>
+      <div class="menu row"><button id="btnSelectGo" class="primary">Go to the party</button><button data-back>Back</button></div>
+      <p class="foot">Cake cut in <b class="cd"></b></p>
+    </div>
+  </section>
+
+  <section id="levels" class="screen" hidden>
+    <div class="panel"><h2>Level Select</h2><div id="levelList" class="menu"></div><div class="menu"><button data-go="select">Change character</button><button data-back>Back</button></div>
+    <p class="foot">Cake cut in <b class="cd"></b></p></div>
+  </section>
+
+  <!-- ===== SETTINGS ===== -->
+  <section id="settings" class="screen" hidden>
+    <div class="panel">
+      <h2>Settings</h2>
+      <label>Music volume <input id="setMusic" type="range" min="0" max="1" step="0.05" title="Louder than Dee's memory (cake in the countdown)"></label>
+      <label>Sound effects <input id="setSfx" type="range" min="0" max="1" step="0.05"></label>
+      <label class="chk"><input id="setTouch" type="checkbox"> On-screen touch controls</label>
+      <label>Dee's memory <input type="range" min="0" max="100" value="3" disabled title="Cake cut in the banner above, Dee"></label>
+      <p class="hint">Dee's memory is stuck at 3% (not adjustable). Reminder: <b class="cd"></b> until the cake.</p>
+      <div class="menu row"><button id="btnReset">Reset progress</button><button data-back>Back</button></div>
+      <p class="whisper">psst — Dee — cake in <span class="cd"></span></p>
+    </div>
+  </section>
+
+  <!-- ===== HELP ===== -->
+  <section id="help" class="screen" hidden>
+    <div class="panel wide">
+      <h2>Help &amp; Controls</h2>
+      <div class="cols">
+        <div><h3>Keyboard</h3><p>Move: <kbd>A</kbd><kbd>D</kbd> / arrows<br>Jump: <kbd>Space</kbd> / <kbd>K</kbd> (hold = higher)<br>Drop through platform: <kbd>S</kbd>+<kbd>Space</kbd><br>Fire: <kbd>J</kbd> / <kbd>X</kbd> (hold <kbd>W</kbd> to aim up)<br>Pause: <kbd>Esc</kbd></p></div>
+        <div><h3>Gamepad</h3><p>Move: stick / d-pad<br>Jump: <kbd>A</kbd> / <kbd>B</kbd><br>Fire: <kbd>X</kbd> / <kbd>Y</kbd> / bumpers / <kbd>RT</kbd><br>Pause: Start<br>Menus: d-pad + A</p></div>
+        <div><h3>Touch</h3><p>Left thumb: ◀ ▶<br>Right thumb: JUMP / FIRE<br>⏸ top right to pause. Landscape works best.</p></div>
+      </div>
+      <h3>Goal</h3>
+      <p>Reach the glowing party door in every level. Collect vinyl for points, grab ♥ to heal, and shoot every Clanker (AI drone, bot or turret). Beat the Overfit to open the final gate. Then cut the cake in the DJ booth.</p>
+      <h3>DJ Booth</h3>
+      <p>Two decks mix CC0 tracks from <b>Stopiffy</b>, our parody streaming service: pick a track, <b>SYNC</b> the tempos, ride the crossfader, play with bass / treble, and loop 4 beats. Bo0m's Spotify panel embeds your own Spotify link (it can't be beat-matched; Spotify audio can't be mixed in a browser).</p>
+      <details><summary>Dee's survival tips</summary><p>1. Check the clock. 2. The clock is on every screen. 3. The cake is in <b class="cd"></b>. 4. Still reading? Go.</p></details>
+      <div class="menu row"><button data-back>Back</button></div>
+      <p class="whisper">⏳ <span class="cd"></span> ⏳ (this line is hidden in plain sight, Dee)</p>
+    </div>
+  </section>
+
+  <section id="credits" class="screen" hidden>
+    <div class="panel">
+      <h2>Credits</h2>
+      <p>Made for Kerry Queenslayer's birthday by the Weirdlings Anti-AI Tribe.<br>Music: <b>Stopiffy</b> (CC0, generated in-browser, so no AI model involved, just maths and chaos).</p>
+      <p>Cast: DeeDarkgloom · Dizzle (a cake) · Bo0m / Lucky Salvage · Hypnotized / Ilian · Myster Y. Deep · Helix · Kerry Queenslayer</p>
+      <p class="hint">Cake cut in <b class="cd"></b>. Build v<span id="ver"></span></p>
+      <div class="menu row"><button data-back>Back</button></div>
+    </div>
+  </section>
+
+  <!-- ===== PAUSE / OVER ===== -->
+  <section id="pause" class="screen" hidden>
+    <div class="panel"><h2>Paused</h2>
+      <p class="big">Dee's pager: cake in <b class="cd"></b></p>
+      <div class="menu"><button id="btnResume" class="primary">Resume</button><button id="btnRestart">Restart level</button><button data-go="settings">Settings</button><button data-go="help">Help</button><button id="btnQuit">Quit to title</button></div>
+    </div>
+  </section>
+  <section id="over" class="screen" hidden>
+    <div class="panel"><h2>Glitched Out</h2><p>Score <b id="overScore">0</b>. The Simulation wins this round. But the cake gets cut in <b class="cd"></b>!</p>
+      <div class="menu"><button id="btnRetry" class="primary">Try again</button><button id="btnOverMenu">Title</button></div></div>
+  </section>
+
+  <!-- ===== PARTY / DJ ===== -->
+  <section id="party" class="screen" hidden>
+    <div class="panel"><div id="confetti"></div>
+      <h2>🎉 Happy Birthday Kerry! 🎉</h2>
+      <p class="big">You made it. Score <b id="finalScore">0</b>.</p>
+      <p>Dizzle (now a cake) is on the decks. DJs, step up!</p>
+      <div class="menu"><button id="btnPartyDJ" class="primary">🎧 Open the DJ Booth</button><button data-go="title">Title</button></div>
+      <p class="foot">Cake cut in <b class="cd"></b></p></div>
+  </section>
+  <section id="dj" class="screen" hidden>
+    <div class="djwrap"><div class="djhead"><h2>🎧 DJ Booth</h2><button data-back>Back</button></div>
+      <p class="muted">Deck tracks by <b>Stopiffy</b> (CC0). Cake cut in <b class="cd"></b></p>
+      <div id="djRoot"></div></div>
+  </section>
+
+  <!-- ===== DIALOGUE ===== -->
+  <div id="dlg" hidden>
+    <div id="dlgPic">?</div>
+    <div class="dlgBody"><b id="dlgName">Narrator</b><p id="dlgText"></p></div>
+    <button id="dlgNext">Next ▶</button>
+  </div>
+</div>
+
+<noscript>This game needs JavaScript. Dee needs a clock: the cake is cut Friday 9 October 2026.</noscript>
+<script src="js/config.js"></script>
+<script src="js/countdown.js"></script>
+<script src="js/stopiffy.js"></script>
+<script src="js/input.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/spotify.js"></script>
+<script src="js/dj.js"></script>
+<script src="js/game.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+<script>document.getElementById('ver').textContent = WL.CONFIG.version;</script>
+</body>
+</html>
