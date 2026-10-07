@@ -132,6 +132,7 @@ WL.UI = (function () {
     if (P.up) { els[(i - 1 + els.length) % els.length].focus(); }
     if (P.accept && i >= 0 && els[i].tagName === 'BUTTON') els[i].click();
     if (P.pause && cur === 'pause') pause(false);
+    else if ((P.pause || P.back) && cur !== 'title' && cur !== 'over' && cur !== 'party') back();
   }
 
   function bind() {
