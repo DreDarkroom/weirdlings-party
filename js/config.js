@@ -1,4 +1,4 @@
-window.WL = window.WL || {};
+﻿window.WL = window.WL || {};
 WL.CONFIG = {
   // Everything is defined in UK time (the party's local time). The +01:00 offset (BST) makes the
   // countdown identical for every player, whatever their own time zone.
@@ -10,10 +10,11 @@ WL.CONFIG = {
   // Deployed Stopiffy origin (empty = use the bundled catalogue).
   stopiffyBase: 'https://dredarkroom.github.io/stopiffy',
   // Shared wishes/feedback API (Cloudflare Worker in /backend). Empty = wishes stay on this device.
-  apiBase: '',
+  apiBase: 'https://weirdlings-wishes.andreas-93f.workers.dev',
   // Where "send feedback / suggest an idea" links open a pre-filled GitHub issue.
   issuesRepo: 'DreDarkroom/weirdlings-party',
   // Spotify app client id (PKCE flow, not yet wired). Empty = embed-only mode.
   spotifyClientId: '',
   version: '0.2.0'
 };
+

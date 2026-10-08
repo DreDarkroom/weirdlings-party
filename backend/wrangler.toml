@@ -1,4 +1,4 @@
-name = "weirdlings-wishes"
+﻿name = "weirdlings-wishes"
 main = "worker.js"
 compatibility_date = "2026-01-01"
 
@@ -8,4 +8,5 @@ ALLOWED_ORIGIN = "https://dredarkroom.github.io"
 # Create with:  npx wrangler kv namespace create WISHES   then paste the id below.
 [[kv_namespaces]]
 binding = "WISHES"
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
+id = "e3ac24e3ed6d4cc6a0dfabad12364257"
+

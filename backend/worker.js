@@ -33,7 +33,8 @@ export default {
   async fetch(req, env) {
     const url = new URL(req.url), path = url.pathname;
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(env, req) });
-    const admin = req.headers.get('x-admin-token') && req.headers.get('x-admin-token') === env.ADMIN_TOKEN;
+    const secret = String(env.ADMIN_TOKEN || '').trim(), sent = (req.headers.get('x-admin-token') || '').trim();
+    const admin = !!secret && sent === secret;
 
     if (path === '/wishes' && req.method === 'GET') {
       const to = url.searchParams.get('to');
