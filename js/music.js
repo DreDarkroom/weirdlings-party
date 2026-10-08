@@ -5,7 +5,9 @@
 // The DJ booth (and micro-games) suspend the music: the DJ booth does it with a vinyl-stop effect, then it resumes on exit.
 WL.Music = (function () {
   var KEY = 'wl.music';
-  var STYLES = [['auto', '✨ Auto'], ['synthwave', '🌆 Synthwave'], ['house', '🏠 House'], ['techno', '⚡ Techno'], ['breaks', '🥁 Breaks'], ['chill', '🌊 Chill']];
+  // Genre chips. A genre only shows once the catalogue has tracks in it, so new Stopiffy styles appear automatically.
+  var STYLES = [['auto', '✨ Auto'], ['synthwave', '🌆 Synthwave'], ['house', '🏠 House'], ['techno', '⚡ Techno'], ['dnb', '🌀 Drum & Bass'], ['breaks', '🥁 Breaks'], ['trance', '🔮 Trance'], ['electro', '🤖 Electro'], ['lofi', '☕ Lo-fi'], ['chill', '🌊 Chill']];
+  function availableStyles() { return STYLES.filter(function (s) { return s[0] === 'auto' || tracks.some(function (t) { return t.style === s[0]; }); }); }
   var st = { source: 'game', style: 'auto', track: null, shuffle: true, on: true, prevVol: 0.6 };
   var tracks = [], curId = null, ctxId = 'simulation-lullaby', susp = {}, plays = 0, started = false, search = '';
   try { var s = JSON.parse(localStorage.getItem(KEY)); if (s) Object.keys(st).forEach(function (k) { if (s[k] !== undefined) st[k] = s[k]; }); } catch (e) {}
@@ -93,7 +95,7 @@ WL.Music = (function () {
     p.appendChild(seg);
     p.appendChild(el('p', 'muted', st.source === 'stopiffy' ? 'Stopiffy: free CC0 music that anyone can use. Pick any track to play it instead of the in-game soundtrack.' : (st.style === 'auto' ? 'Auto: the soundtrack follows what you\'re doing: menus, levels, bosses and finales.' : 'Playing a ' + st.style + ' playlist from the soundtrack.')));
     var chips = el('div', 'chips'); chips.setAttribute('role', 'group'); chips.setAttribute('aria-label', 'Music style');
-    STYLES.forEach(function (s) { var b = el('button', st.style === s[0] ? 'on' : '', s[1]); b.type = 'button'; b.onclick = function () { setStyle(s[0]); b.blur(); }; chips.appendChild(b); });
+    availableStyles().forEach(function (s) { var b = el('button', st.style === s[0] ? 'on' : '', s[1]); b.type = 'button'; b.onclick = function () { setStyle(s[0]); b.blur(); }; chips.appendChild(b); });
     p.appendChild(chips);
     var row = el('div', 'mpRow');
     if (st.source === 'stopiffy') {

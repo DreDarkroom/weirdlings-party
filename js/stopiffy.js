@@ -37,7 +37,11 @@
     techno:    { kick: 'x...x...x...x...', clap: '....x.......x...', chat: 'xxxxxxxxxxxxxxxx', ohat: '..x...x...x...x.', bass: 'x.xxx.xxx.xxx.xx', wave: 'sawtooth', lead: 0.25 },
     breaks:    { kick: 'x.....x...x.....', clap: '....x..x.x..x...', chat: 'x.x.x.x.x.x.x.xx', ohat: '......x.......x.', bass: 'x..x..x.x..x..x.', wave: 'square',   lead: 0.4 },
     chill:     { kick: 'x.......x.x.....', clap: '........x.......', chat: 'x.x.x.x.x.x.x.x.', ohat: '.......x.......x', bass: 'x.....x.....x...', wave: 'triangle', lead: 0.3 },
-    synthwave: { kick: 'x...x...x...x...', clap: '....x.......x...', chat: 'x.x.x.x.x.x.x.x.', ohat: '..x...x...x...x.', bass: 'xxxxxxxxxxxxxxxx', wave: 'sawtooth', lead: 0.5 }
+    synthwave: { kick: 'x...x...x...x...', clap: '....x.......x...', chat: 'x.x.x.x.x.x.x.x.', ohat: '..x...x...x...x.', bass: 'xxxxxxxxxxxxxxxx', wave: 'sawtooth', lead: 0.5 },
+    dnb:       { kick: 'x.......x.......', clap: '....x.......x...', chat: 'x.x.x.x.x.x.x.x.', ohat: '..x...x...x...x.', bass: 'x..x..x..x..x..x', wave: 'square',   lead: 0.4 },
+    trance:    { kick: 'x...x...x...x...', clap: '....x.......x...', chat: 'x.x.x.x.x.x.x.x.', ohat: '..x...x...x...x.', bass: 'x.x.x.x.x.x.x.x.', wave: 'sawtooth', lead: 0.6 },
+    lofi:      { kick: 'x.......x.......', clap: '....x.......x...', chat: 'x...x...x...x...', ohat: '........x.......', bass: 'x.......x.......', wave: 'triangle', lead: 0.2 },
+    electro:   { kick: 'x...x...x...x...', clap: '....x.......x...', chat: 'x.x.x.x.x.x.x.x.', ohat: '..x...x...x...x.', bass: 'x.xx.x.xx.xx.x.x', wave: 'square',   lead: 0.5 }
   };
 
   var BUILTIN = [
@@ -55,8 +59,20 @@
     { id: 'shoreline-shuffle',     title: 'Shoreline Shuffle',              artist: 'The Tribe Orchestra', style: 'synthwave', bpm: 108, root: 43, scale: 'major',    seed: 1313, bars: 16, tags: ['game', 'part2'] },
     { id: 'pier-pressure',         title: 'Pier Pressure',                  artist: 'The Simulation',      style: 'breaks',    bpm: 136, root: 41, scale: 'minor',    seed: 1414, bars: 16, tags: ['game', 'part2'] },
     { id: 'mick-birthday-anthem',  title: 'Beach Birthday Anthem',          artist: 'The Tribe Orchestra', style: 'house',     bpm: 124, root: 40, scale: 'major',    seed: 1515, bars: 16, tags: ['dj', 'birthday', 'part2'] },
-    { id: 'kerry-birthday-anthem',title: 'Queenslayer Birthday Anthem',    artist: 'Kerry Queenslayer',   style: 'house',     bpm: 126, root: 43, scale: 'major',    seed: 7707, bars: 16, tags: ['dj', 'birthday'] }
-  ].map(function (t) { t.license = 'CC0-1.0'; t.duration = Math.round(t.bars * 4 * 60 / t.bpm * 10) / 10; return t; });
+    { id: 'kerry-birthday-anthem',title: 'Queenslayer Birthday Anthem',    artist: 'Kerry Queenslayer',   style: 'house',     bpm: 126, root: 43, scale: 'major',    seed: 7707, bars: 16, tags: ['dj', 'birthday'] },
+    { id: 'jungle-rumble',        title: 'Jungle Rumble',                  artist: 'Subsonic',            style: 'dnb',       bpm: 174, root: 38, scale: 'phrygian', seed: 8808, bars: 16, tags: ['mood', 'energetic'] },
+    { id: 'neon-drifter',         title: 'Neon Drifter',                   artist: 'The Simulation',      style: 'dnb',       bpm: 170, root: 40, scale: 'minor',    seed: 8809, bars: 16, tags: ['mood', 'dark'] },
+    { id: 'aurora-breeze',        title: 'Aurora Breeze',                  artist: 'Tranceiver',          style: 'trance',    bpm: 138, root: 45, scale: 'minor',    seed: 9901, bars: 16, tags: ['mood', 'euphoric'] },
+    { id: 'starlight-pulse',      title: 'Starlight Pulse',                artist: 'Tranceiver',          style: 'trance',    bpm: 140, root: 41, scale: 'dorian',   seed: 9902, bars: 16, tags: ['mood', 'uplifting'] },
+    { id: 'rainy-cafe',           title: 'Rainy Cafe',                     artist: 'Coffee Beans',        style: 'lofi',      bpm: 80,  root: 43, scale: 'major',    seed: 1121, bars: 16, tags: ['mood', 'chill'] },
+    { id: 'midnight-study',       title: 'Midnight Study',                 artist: 'Coffee Beans',        style: 'lofi',      bpm: 78,  root: 36, scale: 'minor',    seed: 1122, bars: 16, tags: ['mood', 'focus'] },
+    { id: 'voltage-spike',        title: 'Voltage Spike',                  artist: 'Circuit Breaker',     style: 'electro',   bpm: 128, root: 40, scale: 'phrygian', seed: 3341, bars: 16, tags: ['mood', 'energetic'] },
+    { id: 'robotic-groove',       title: 'Robotic Groove',                 artist: 'Circuit Breaker',     style: 'electro',   bpm: 130, root: 38, scale: 'dorian',   seed: 3342, bars: 16, tags: ['mood', 'funky'] },
+    { id: 'deep-space-echo',      title: 'Deep Space Echo',                artist: 'Hypnotized',          style: 'techno',    bpm: 125, root: 38, scale: 'minor',    seed: 5561, bars: 16, tags: ['mood', 'dark'] },
+    { id: 'sunset-drive',         title: 'Sunset Drive',                   artist: 'Helix',               style: 'synthwave', bpm: 115, root: 41, scale: 'major',    seed: 6671, bars: 16, tags: ['mood', 'chill'] },
+    { id: 'broken-glass',         title: 'Broken Glass',                   artist: 'Bo0m',                style: 'breaks',    bpm: 135, root: 45, scale: 'phrygian', seed: 7781, bars: 16, tags: ['mood', 'aggressive'] },
+    { id: 'summer-vibes',         title: 'Summer Vibes',                   artist: 'Dizzle',              style: 'house',     bpm: 122, root: 43, scale: 'major',    seed: 8891, bars: 16, tags: ['mood', 'happy'] }
+  ].map(function (t) { t.license = 'CC0-1.0'; t.duration = Math.round(t.bars * 4 * 60 / t.bpm * 10) / 10; t.beatOffset = 0; return t; });
 
   // ---- Synthesis: direct sample-level DSP (no audio graph => fast on phones) ----
   function renderTrack(track, opts) {
@@ -67,7 +83,8 @@
     var r = mulberry(track.seed);
     var spb = 60 / track.bpm, step = spb / 4, bars = track.bars || 16;
     var N = Math.ceil(bars * 16 * step * sr);
-    var buf = new Float32Array(N);
+    var N_full = Math.ceil((bars + 1) * 16 * step * sr);
+    var buf = new Float32Array(N_full);
     var TAU = 6.283185307179586;
 
     function wave(type, ph) {
@@ -76,7 +93,7 @@
       if (type === 'triangle') return ph < 0.5 ? 4 * ph - 1 : 3 - 4 * ph;
       return Math.sin(TAU * ph);
     }
-    function add(i, v) { if (i >= 0 && i < N) buf[i] += v; }
+    function add(i, v) { if (i >= 0 && i < N_full) buf[i] += v; }
     function noiseHit(t, len, peak, hp, lpCut) {
       var i0 = Math.floor(t * sr), n = Math.floor(len * sr), prev = 0, lp = 0, a = 1 - Math.exp(-TAU * lpCut / sr);
       for (var i = 0; i < n; i++) {
@@ -133,14 +150,18 @@
         }
       }
     }
+    for (var j = 0; j < N_full - N; j++) {
+      buf[j] += buf[N + j];
+    }
     var peak = 0, i;
     for (i = 0; i < N; i++) { var a = Math.abs(buf[i]); if (a > peak) peak = a; }
     var gain = peak > 0 ? 0.85 / peak : 1;
     for (i = 0; i < N; i++) buf[i] = Math.tanh(buf[i] * gain * 1.1);
+    var outBuf = buf.subarray(0, N);
     var AB = opts.AudioBuffer || (typeof AudioBuffer !== 'undefined' ? AudioBuffer : null);
-    if (!AB) return Promise.resolve({ sampleRate: sr, length: N, duration: N / sr, data: buf });
+    if (!AB) return Promise.resolve({ sampleRate: sr, length: N, duration: N / sr, data: outBuf });
     var ab = new AB({ length: N, sampleRate: sr, numberOfChannels: 1 });
-    ab.copyToChannel(buf, 0);
+    ab.copyToChannel(outBuf, 0);
     return Promise.resolve(ab);
   }
 
@@ -168,7 +189,25 @@
     var p = typeof trackOrId === 'string' ? self.find(trackOrId) : Promise.resolve(trackOrId);
     return p.then(function (t) {
       if (!t) throw new Error('Unknown track');
-      if (!self._cache[t.id]) self._cache[t.id] = renderTrack(t);
+      if (!self._cache[t.id]) {
+        if (t.url) {
+          self._cache[t.id] = fetch(t.url)
+            .then(function (r) {
+              if (!r.ok) throw new Error(r.status);
+              return r.arrayBuffer();
+            })
+            .then(function (buf) {
+              var AC = typeof AudioContext !== 'undefined' ? AudioContext : (typeof webkitAudioContext !== 'undefined' ? webkitAudioContext : null);
+              if (!AC) throw new Error('AudioContext not supported');
+              var ac = new AC();
+              return new Promise(function (resolve, reject) {
+                ac.decodeAudioData(buf, resolve, reject);
+              });
+            });
+        } else {
+          self._cache[t.id] = renderTrack(t);
+        }
+      }
       return self._cache[t.id];
     });
   };
