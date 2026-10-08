@@ -17,6 +17,21 @@
   <span id="cdMsg"></span>
 </div>
 
+<div id="musicBar" role="region" aria-label="Music player">
+  <button id="mbPrev" aria-label="Previous track">⏮</button>
+  <button id="mbToggle" aria-label="Pause music">⏸</button>
+  <button id="mbNext" aria-label="Next track">⏭</button>
+  <span id="mbSrc" class="chip game">GAME</span>
+  <span id="mbNow" class="now" aria-live="polite">♪ …</span>
+  <button id="mbMute" aria-label="Mute music">🔊</button>
+  <input id="mbVol" type="range" min="0" max="1" step="0.05" aria-label="Music volume">
+  <button id="mbMore" aria-expanded="false" aria-controls="musicPanel">🎚 Music ▾</button>
+</div>
+<div id="musicPanel" hidden role="dialog" aria-label="Music options">
+  <div class="mpHead"><b>🎚 Music</b><button id="mpClose" aria-label="Close music options">✕</button></div>
+  <div id="mpBody"></div>
+</div>
+
 <div id="stage">
   <canvas id="game" aria-label="Game"></canvas>
   <div id="bubble" role="status"></div>
@@ -279,6 +294,7 @@
 <script src="js/cake.js"></script>
 <script src="js/wishes.js"></script>
 <script src="js/lab.js"></script>
+<script src="js/music.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/main.js"></script>
 <script>document.getElementById('ver').textContent = WL.CONFIG.version;</script>

@@ -79,7 +79,8 @@ WL.UI = (function () {
     var sc = $(id); if (sc && sc.scrollTo) sc.scrollTo(0, 0);
     if (HOOK[id]) HOOK[id]();
     focusFirst();
-    if (id === 'dj') { WL.Audio.unlock(); WL.DJ.open(); } else if (WL.DJ.built) WL.DJ.close();
+    if (id === 'dj') { WL.Audio.unlock(); WL.Music.suspend('dj', true); WL.DJ.open(); }   // music stops with a vinyl brake, resumes when you leave
+    else { if (WL.DJ.built) WL.DJ.close(); WL.Music.resume('dj'); }
     if (id !== 'micro') WL.Lab.stop();
   }
   function back() {
@@ -112,7 +113,7 @@ WL.UI = (function () {
     opts = opts || {};
     if (li >= 3 && !canPart2()) { toast('Finish the Kerry party first to unlock Part 2.'); return; }
     lastLevel = li; WL.Audio.unlock(); hideAll(); document.body.classList.add('playing');
-    var begin = function () { WL.Audio.playBgm(WL.Game.LEVELS[li].bgm); WL.Game.start(li, charId, onEnd); };
+    var begin = function () { WL.Music.context(WL.Game.LEVELS[li].bgm); WL.Game.start(li, charId, onEnd); };
     var pre = STORY[li === 0 ? 'intro' : 'before' + li];
     if (pre && !opts.skipIntro) dialogue(pre, begin); else begin();
   }
@@ -129,7 +130,7 @@ WL.UI = (function () {
     if (after) dialogue(after, next); else next();
   }
   function finale(n, res) {
-    WL.Audio.playBgm(n === 1 ? 'kerry-birthday-anthem' : 'mick-birthday-anthem');
+    WL.Music.context(n === 1 ? 'kerry-birthday-anthem' : 'mick-birthday-anthem');
     WL.Game.stop();
     var who = n === 1 ? 'Kerry' : 'Mick';
     $('partyTitle').textContent = '🎉 Happy Birthday ' + who + '! 🎉';
@@ -208,7 +209,7 @@ WL.UI = (function () {
     $('dlgNext').onclick = function () { if (dlg) dlg.step(); };
     $('btnResume').onclick = function () { pause(false); };
     $('btnRestart').onclick = function () { WL.Game.stop(); startLevel(lastLevel, { skipIntro: true }); };
-    $('btnQuit').onclick = function () { WL.Game.stop(); WL.Audio.playBgm('simulation-lullaby'); stack = ['title']; show('title', false); };
+    $('btnQuit').onclick = function () { WL.Game.stop(); WL.Music.context('simulation-lullaby'); stack = ['title']; show('title', false); };
     $('btnRetry').onclick = function () { startLevel(lastLevel, { skipIntro: true }); };
     $('btnOverMenu').onclick = function () { stack = ['title']; show('title', false); };
     $('btnPartyDJ').onclick = function () { show('dj'); };
@@ -230,7 +231,7 @@ WL.UI = (function () {
     if (WL.Input.padName) toast('🎮 Controller ready');
   }
   function init() {
-    bind(); WL.Input.bindTouch(); WL.Wishes.bind(); WL.Dev.init(); show('title', false);
+    bind(); WL.Input.bindTouch(); WL.Wishes.bind(); WL.Dev.init(); WL.Music.init(); show('title', false);
     fetch('content/story.json', { cache: 'no-cache' }).then(function (r) { return r.json(); }).then(mergeStory).catch(function () {});
     WL.Lab.loadManifest();
   }

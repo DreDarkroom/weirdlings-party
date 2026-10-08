@@ -25,13 +25,13 @@ WL.Lab = (function () {
   // ---- play a micro-game -----------------------------------------------
   function play(id) {
     var g = games.filter(function (x) { return x.id === id; })[0]; if (!g || !g.play) return;
-    WL.UI.show('micro'); WL.Audio.unlock();
+    WL.UI.show('micro'); WL.Audio.unlock(); WL.Music.suspend('micro', false);
     var host = document.getElementById('microHost'); host.innerHTML = '';
     document.getElementById('microTitle').textContent = g.title; document.getElementById('microScore').textContent = '';
     var api = { W: 480, H: 320, input: WL.Input, sfx: WL.Audio.sfx, toast: WL.UI.toast, audio: WL.Audio, score: function (n) { document.getElementById('microScore').textContent = String(n); }, done: function (msg) { WL.Audio.sfx('win'); WL.UI.toast(msg || 'Nice one!'); } };
     try { running = g.play(host, api) || {}; } catch (e) { host.textContent = 'This micro-game crashed: ' + e.message; running = null; }
   }
-  function stop() { if (running && running.stop) { try { running.stop(); } catch (e) {} } running = null; var h = document.getElementById('microHost'); if (h) h.innerHTML = ''; }
+  function stop() { if (running && running.stop) { try { running.stop(); } catch (e) {} } running = null; var h = document.getElementById('microHost'); if (h) h.innerHTML = ''; WL.Music.resume('micro'); }
 
   // ---- feedback --------------------------------------------------------
   function sendFeedback(kind, title, body) {
