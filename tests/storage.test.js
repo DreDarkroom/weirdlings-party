@@ -84,4 +84,11 @@ global.localStorage.setItem('wl.music', '{}');
 Storage.resetAll();
 ['wl.wishes.v1', 'wl.cake.v1', 'wl.dev', 'wl.music'].forEach((k) => assert.strictEqual(mockStorage[k], undefined));
 
+// Difficulty defaults to Normal (1) and is preserved when saved
+resetMock();
+data = Storage.load();
+assert.strictEqual(data.save.diff, 1);
+data.save.diff = 2; Storage.save(data);
+assert.strictEqual(Storage.load().save.diff, 2);
+
 console.log('All tests passed!');
