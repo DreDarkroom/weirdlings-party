@@ -52,6 +52,9 @@
     { id: 'hypnotized-spiral',    title: 'Spiral Down',                    artist: 'Hypnotized',          style: 'techno',    bpm: 126, root: 36, scale: 'dorian',   seed: 4404, bars: 16, tags: ['dj'] },
     { id: 'myster-deep-end',      title: 'The Deep End',                   artist: 'Myster Y. Deep',      style: 'chill',     bpm: 118, root: 38, scale: 'minor',    seed: 5505, bars: 16, tags: ['dj'] },
     { id: 'helix-double-strand',  title: 'Double Strand',                  artist: 'Helix',               style: 'synthwave', bpm: 122, root: 45, scale: 'dorian',   seed: 6606, bars: 16, tags: ['dj'] },
+    { id: 'shoreline-shuffle',     title: 'Shoreline Shuffle',              artist: 'The Tribe Orchestra', style: 'synthwave', bpm: 108, root: 43, scale: 'major',    seed: 1313, bars: 16, tags: ['game', 'part2'] },
+    { id: 'pier-pressure',         title: 'Pier Pressure',                  artist: 'The Simulation',      style: 'breaks',    bpm: 136, root: 41, scale: 'minor',    seed: 1414, bars: 16, tags: ['game', 'part2'] },
+    { id: 'mick-birthday-anthem',  title: 'Beach Birthday Anthem',          artist: 'The Tribe Orchestra', style: 'house',     bpm: 124, root: 40, scale: 'major',    seed: 1515, bars: 16, tags: ['dj', 'birthday', 'part2'] },
     { id: 'kerry-birthday-anthem',title: 'Queenslayer Birthday Anthem',    artist: 'Kerry Queenslayer',   style: 'house',     bpm: 126, root: 43, scale: 'major',    seed: 7707, bars: 16, tags: ['dj', 'birthday'] }
   ].map(function (t) { t.license = 'CC0-1.0'; t.duration = Math.round(t.bars * 4 * 60 / t.bpm * 10) / 10; return t; });
 

@@ -14,11 +14,12 @@ PC, Mac, phones and tablets with keyboard, gamepad and touch controls. Narrative
 out they live in a simulation, the tribe heads to artist Kerry Queenslayer's birthday party (from China; honouree).
 DeeDarkgloom (DJ, very forgetful) agreed 9 months ago to DJ. A prominent countdown to the DJ cake being cut is on EVERY
 screen (banner, HUD, in-world billboards, tab title, menus, settings, help, hidden spots).
-DEADLINE: party is Friday 9 Oct 2026 (config default 20:00 local, unconfirmed).
+DEADLINE: party is Friday 9 Oct 2026. Countdown targets 7pm UK (Bo0m's Spotify playlist). Set list: 7:00 Bo0m, 7:40 Myster Y. Deep, 9:00 Hypnotized, 10:20 DeeDarkgloom, 11:40 Helix (to 1am). Cake-cut time TBC. Part 2 = Mick Beach's birthday (date TBC), unlocked after Part 1 (or Developer mode).
 Characters: DeeDarkgloom, Dizzle (a DJ who turned into a cake and DJs as a cake while Kerry cuts him), Bo0m (Lucky
 Salvage, may not DJ live, so plays via Spotify), Hypnotized (Ilian), Myster Y. Deep, Helix, Kerry Queenslayer.
 
-CURRENT STATE (v0.1, deployed)
+CURRENT STATE (v0.2, deployed). Added since v0.1: set list, Part 2 beach levels, sign book + birthday cards (local until the Cloudflare Worker in /backend is deployed), Cake·AI fake-AI hand-drawn cake with stylus support, Developer mode (perf HUD + test tools + Dev Lab), Workshop with micro-games, Writers' Room, CONTRIBUTING.md. PRIVACY RULE: never use real people's names from private material; only in-game character names.
+CURRENT STATE (v0.1 baseline)
 - Game: https://dredarkroom.github.io/weirdlings-party/  repo DreDarkroom/weirdlings-party
   Vanilla JS + canvas, no build step, PWA. 3 levels (procedural seeded), 5 playable characters with perks, enemies
   (walker/drone/turret), boss (Overfit), story dialogue, finale, countdown everywhere, .ics calendar export.
