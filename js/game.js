@@ -27,6 +27,11 @@ WL.Game = (function () {
 
   // ---------------------------------------------------------------- state
   var S = null, running = false, paused = false, last = 0, tAll = 0, onEnd = null, attractX = 0, shake = 0;
+  var reducedMotion = false;
+  if (window.matchMedia) {
+    reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', function(e) { reducedMotion = e.matches; });
+  }
 
   function build(li) {
     var spec = LEVELS[li], r = rng(spec.seed);
@@ -132,6 +137,7 @@ WL.Game = (function () {
     for (var i = 0; i < n; i++) { var a = Math.random() * 6.283, s = (0.3 + Math.random()) * (spd || 200); S.parts.push({ x: x, y: y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 60, life: 0.5 + Math.random() * 0.5, color: color, size: 2 + Math.random() * 3 }); }
   }
   function confetti(n) {
+    if (reducedMotion) return;
     var cols = ['#ff4fd8', '#38f2c1', '#ffd23f', '#8b5cf6', '#f43f5e'];
     for (var i = 0; i < n; i++) S.parts.push({ x: Math.random() * W + (S.cam || 0), y: -10 - Math.random() * 200, vx: (Math.random() - 0.5) * 60, vy: 60 + Math.random() * 120, life: 4 + Math.random() * 3, color: cols[i % 5], size: 3 + Math.random() * 4, g: 0 });
   }
@@ -156,14 +162,14 @@ WL.Game = (function () {
     if (WL.Dev && WL.Dev.flags.god) return;
     if (p.inv > 0 || S.state !== 'play') return;
     if (p.ch.luck && Math.random() < p.ch.luck) { p.inv = 0.6; WL.UI.say('Lucky! Salvaged that one.'); burst(p.x + 10, p.y + 10, '#ffd23f', 10); return; }
-    p.hp--; p.inv = 1.3; p.vy = -320; p.vx = (p.x < from ? -1 : 1) * 260; shake = 0.25;
+    p.hp--; p.inv = 1.3; p.vy = -320; p.vx = (p.x < from ? -1 : 1) * 260; if (!reducedMotion) shake = 0.25;
     WL.Audio.sfx('hurt'); burst(p.x + 10, p.y + 14, '#ff4d6d', 12);
     if (p.hp <= 0) { S.state = 'dead'; S.endT = 0; burst(p.x + 10, p.y + 14, p.ch.color, 40, 300); WL.Audio.sfx('boom'); }
   }
   function killEnemy(e) {
     e.dead = true; S.score += e.pts; S.kills++; WL.Audio.sfx('boom'); burst(e.x + e.w / 2, e.y + e.h / 2, e.type === 'boss' ? '#ffd23f' : '#ff7a59', e.type === 'boss' ? 80 : 18, e.type === 'boss' ? 400 : 220);
     if (Math.random() < 0.18 && e.type !== 'boss') S.items.push({ type: 'heart', x: e.x, y: e.y });
-    if (e.type === 'boss') { S.goal.open = true; shake = 0.8; WL.UI.say('The Overfit overheated! The gate to the party is open!'); }
+    if (e.type === 'boss') { S.goal.open = true; if (!reducedMotion) shake = 0.8; WL.UI.say('The Overfit overheated! The gate to the party is open!'); }
   }
 
   // ---------------------------------------------------------------- update
@@ -403,7 +409,7 @@ WL.Game = (function () {
     S.parts.forEach(function (q) { cx.globalAlpha = Math.min(1, q.life * 2); cx.fillStyle = q.color; cx.fillRect(q.x, q.y, q.size, q.size); }); cx.globalAlpha = 1;
     cx.restore();
     // glitch overlay
-    if (spec.glitch && Math.random() < 0.06 * spec.glitch) { for (var gi = 0; gi < 3; gi++) { cx.fillStyle = Math.random() < 0.5 ? 'rgba(255,0,200,.18)' : 'rgba(0,255,230,.18)'; cx.fillRect(0, Math.random() * H, W, 4 + Math.random() * 14); } }
+    if (!reducedMotion && spec.glitch && Math.random() < 0.06 * spec.glitch) { for (var gi = 0; gi < 3; gi++) { cx.fillStyle = Math.random() < 0.5 ? 'rgba(255,0,200,.18)' : 'rgba(0,255,230,.18)'; cx.fillRect(0, Math.random() * H, W, 4 + Math.random() * 14); } }
     hud(t);
   }
   function hud(t) {

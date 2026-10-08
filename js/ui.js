@@ -141,7 +141,13 @@ WL.UI = (function () {
     dialogue(STORY[n === 1 ? 'finale' : 'finale2'], function () { show('party'); });
     for (var i = 0; i < 4; i++) setTimeout(spawnConfetti, i * 400);
   }
-  function spawnConfetti() { var c = $('confetti'); if (!c) return; for (var i = 0; i < 40; i++) { var s = document.createElement('i'); s.style.left = Math.random() * 100 + '%'; s.style.background = ['#ff4fd8', '#38f2c1', '#ffd23f', '#8b5cf6'][i % 4]; s.style.animationDuration = 2 + Math.random() * 3 + 's'; c.appendChild(s); setTimeout(function (e) { e.remove(); }.bind(null, s), 5500); } }
+  var reducedMotion = false;
+  if (window.matchMedia) {
+    reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', function(e) { reducedMotion = e.matches; });
+  }
+
+  function spawnConfetti() { if (reducedMotion) return; var c = $('confetti'); if (!c) return; for (var i = 0; i < 40; i++) { var s = document.createElement('i'); s.style.left = Math.random() * 100 + '%'; s.style.background = ['#ff4fd8', '#38f2c1', '#ffd23f', '#8b5cf6'][i % 4]; s.style.animationDuration = 2 + Math.random() * 3 + 's'; c.appendChild(s); setTimeout(function (e) { e.remove(); }.bind(null, s), 5500); } }
   function cakeCut() { toast('🎂 Dizzle has been cut! HAPPY BIRTHDAY KERRY!'); spawnConfetti(); spawnConfetti(); }
   function pause(v) {
     if (v) { WL.Game.pause(true); document.body.classList.remove('playing'); show('pause'); }
