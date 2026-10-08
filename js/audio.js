@@ -1,9 +1,9 @@
 // Web Audio: sfx synth + background music from Stopiffy.
 WL.Audio = (function () {
   var ctx = null, master, musicGain, sfxGain, bgmSrc = null, bgmGain = null, bgmId = null, token = 0;
-  var settings = { music: 0.6, sfx: 0.8 };
+  var storeData = WL.Storage.load();
+  var settings = storeData.audio;
   var client = new Stopiffy.Client({ base: WL.CONFIG.stopiffyBase });
-  try { var s = JSON.parse(localStorage.getItem('wl.audio')); if (s) settings = Object.assign(settings, s); } catch (e) {}
 
   function unlock() {
     if (!ctx) {
@@ -17,7 +17,13 @@ WL.Audio = (function () {
     return ctx;
   }
   function apply() { if (!ctx) return; musicGain.gain.value = settings.music * 0.7; sfxGain.gain.value = settings.sfx; }
-  function set(k, v) { settings[k] = v; apply(); try { localStorage.setItem('wl.audio', JSON.stringify(settings)); } catch (e) {} }
+  function set(k, v) {
+    settings[k] = v;
+    apply();
+    var data = WL.Storage.load();
+    data.audio[k] = v;
+    WL.Storage.save(data);
+  }
 
   function blip(f0, f1, dur, type, vol) {
     if (!ctx) return;

@@ -2,8 +2,15 @@
 WL.UI = (function () {
   var stack = ['title'], cur = 'title', charId = 'dee', unlocked = 0, part1Done = false, dlg = null, lastLevel = 0;
   var $ = function (id) { return document.getElementById(id); };
-  try { var sv = JSON.parse(localStorage.getItem('wl.save')); if (sv) { charId = sv.charId || charId; unlocked = sv.unlocked || 0; part1Done = !!sv.part1Done; } } catch (e) {}
-  function save() { try { localStorage.setItem('wl.save', JSON.stringify({ charId: charId, unlocked: unlocked, part1Done: part1Done })); } catch (e) {} }
+  var storeData = WL.Storage.load();
+  charId = storeData.save.charId || charId;
+  unlocked = storeData.save.unlocked || 0;
+  part1Done = !!storeData.save.part1Done;
+  function save() {
+    var data = WL.Storage.load();
+    data.save.charId = charId; data.save.unlocked = unlocked; data.save.part1Done = part1Done;
+    WL.Storage.save(data);
+  }
   function canPart2() { return part1Done || WL.Dev.enabled; }
 
   var NAMECOL = { Narrator: '#9a90b8', DeeDarkgloom: '#8b5cf6', Dee: '#8b5cf6', 'Bo0m': '#f59e0b', Hypnotized: '#22d3ee', 'Myster Y. Deep': '#10b981', Helix: '#f43f5e', Kerry: '#ff4fd8', Dizzle: '#f9a8d4', Simulation: '#ef4444', Mick: '#ffb347', 'Cake·AI': '#38f2c1', 'Cake·AI™': '#38f2c1' };
@@ -119,6 +126,14 @@ WL.UI = (function () {
   }
   function onEnd(res) {
     document.body.classList.remove('playing');
+    var data = WL.Storage.load();
+    data.stats.kills = (data.stats.kills || 0) + (res.kills || 0);
+    data.stats.vinyl = (data.stats.vinyl || 0) + (res.vinyl || 0);
+    if (res.win) {
+      var prevBest = data.stats.bestTimes[res.lv];
+      if (prevBest === undefined || res.time < prevBest) data.stats.bestTimes[res.lv] = res.time;
+    }
+    WL.Storage.save(data);
     if (!res.win) { $('overScore').textContent = res.score; show('over'); return; }
     unlocked = Math.max(unlocked, res.lv + 1);
     if (res.lv === 2) { part1Done = true; unlocked = Math.max(unlocked, 3); }
@@ -183,6 +198,18 @@ WL.UI = (function () {
     b.classList.toggle('locked', !canPart2());
   }
 
+  function renderStats() {
+    var data = WL.Storage.load();
+    $('statKills').textContent = data.stats.kills || 0;
+    $('statVinyl').textContent = data.stats.vinyl || 0;
+    var timesHtml = '';
+    WL.Game.LEVELS.forEach(function (l, i) {
+      var t = data.stats.bestTimes[i];
+      timesHtml += '<p>' + (i + 1) + '. ' + l.name + ' Best Time: <b>' + (t !== undefined ? t.toFixed(2) + 's' : '---') + '</b></p>';
+    });
+    $('statTimes').innerHTML = timesHtml;
+  }
+
   // ---------- gamepad menu navigation (called every frame by the game loop)
   function nav() {
     var P = WL.Input.pressed;
@@ -208,6 +235,7 @@ WL.UI = (function () {
     HOOK.workshop = function () { WL.Lab.renderWorkshop(); }; HOOK.writers = function () { WL.Lab.renderWriters(); }; HOOK.devlab = function () { WL.Lab.renderDevLab(); };
     HOOK.cakemaker = function () { WL.Cake.open(); }; HOOK.devmenu = function () { WL.Dev.buildMenu(); }; HOOK.card = function () { WL.Wishes.renderCard(); }; HOOK.signbook = function () { WL.Wishes.prepSign(); };
     document.querySelectorAll('[data-go]').forEach(function (b) { b.addEventListener('click', function () { WL.Audio.unlock(); WL.Audio.sfx('click'); show(b.dataset.go); }); });
+    HOOK.stats = renderStats;
     document.querySelectorAll('[data-back]').forEach(function (b) { b.addEventListener('click', function () { WL.Audio.sfx('click'); back(); }); });
     $('btnPlay').onclick = function () { WL.Audio.unlock(); startLevel(0); };
     $('btnPart2').onclick = function () { WL.Audio.unlock(); if (!canPart2()) { toast('Finish Part 1 (Kerry\'s party) to unlock this.'); return; } startLevel(3); };
@@ -233,7 +261,7 @@ WL.UI = (function () {
     sS.onchange = function () { WL.Audio.sfx('pickup'); };
     sT.checked = WL.Input.isTouch; document.body.classList.toggle('touch', sT.checked);
     sT.onchange = function () { document.body.classList.toggle('touch', this.checked); WL.Game.resize(); };
-    $('btnReset').onclick = function () { if (confirm('Reset progress? (Dee will not remember this either.)')) { unlocked = 0; part1Done = false; save(); toast('Progress reset'); renderTitle(); } };
+    $('btnResetAll').onclick = function () { if (confirm('Reset all data? (Dee will not remember this either.)')) { WL.Storage.resetAll(); location.reload(); } };
     if (WL.Input.padName) toast('🎮 Controller ready');
   }
   function init() {
