@@ -1,14 +1,15 @@
 // Screens, story dialogue, settings, progression. Plain DOM, no framework.
 WL.UI = (function () {
-  var stack = ['title'], cur = 'title', charId = 'dee', unlocked = 0, part1Done = false, dlg = null, lastLevel = 0;
+  var stack = ['title'], cur = 'title', charId = 'dee', unlocked = 0, part1Done = false, diff = 1, dlg = null, lastLevel = 0;
   var $ = function (id) { return document.getElementById(id); };
   var storeData = WL.Storage.load();
   charId = storeData.save.charId || charId;
   unlocked = storeData.save.unlocked || 0;
   part1Done = !!storeData.save.part1Done;
+  diff = storeData.save.diff !== undefined ? storeData.save.diff : 1;
   function save() {
     var data = WL.Storage.load();
-    data.save.charId = charId; data.save.unlocked = unlocked; data.save.part1Done = part1Done;
+    data.save.charId = charId; data.save.unlocked = unlocked; data.save.part1Done = part1Done; data.save.diff = diff;
     WL.Storage.save(data);
   }
   function canPart2() { return part1Done || WL.Dev.enabled; }
@@ -255,12 +256,13 @@ WL.UI = (function () {
     $('btnIcs').onclick = function () { var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([WL.Countdown.ics()], { type: 'text/calendar' })); a.download = 'kerrys-party.ics'; a.click(); };
     $('fbSend').onclick = function () { WL.Lab.sendFeedback($('fbKind').value, $('fbTitle').value, $('fbBody').value).then(function (ok) { if (ok) back(); }); };
     $('microQuit').onclick = function () { back(); };
-    var sM = $('setMusic'), sS = $('setSfx'), sT = $('setTouch');
+    var sM = $('setMusic'), sS = $('setSfx'), sT = $('setTouch'), sD = $('setDiff');
     sM.value = WL.Audio.settings.music; sS.value = WL.Audio.settings.sfx;
     sM.oninput = function () { WL.Audio.set('music', +this.value); }; sS.oninput = function () { WL.Audio.set('sfx', +this.value); };
     sS.onchange = function () { WL.Audio.sfx('pickup'); };
     sT.checked = WL.Input.isTouch; document.body.classList.toggle('touch', sT.checked);
     sT.onchange = function () { document.body.classList.toggle('touch', this.checked); WL.Game.resize(); };
+    sD.value = diff; sD.onchange = function () { diff = +this.value; save(); };
     $('btnResetAll').onclick = function () { if (confirm('Reset all data? (Dee will not remember this either.)')) { WL.Storage.resetAll(); location.reload(); } };
     if (WL.Input.padName) toast('🎮 Controller ready');
   }
@@ -275,6 +277,7 @@ WL.UI = (function () {
     playScene: function (k, done) { if (STORY[k]) dialogue(STORY[k], done); else if (done) done(); }, previewScene: function (l) { dialogue(l); },
     devFinale: function (n) { hideAll(); document.body.classList.remove('playing'); finale(n, null); },
     devSet: function (o) { if ('part1Done' in o) part1Done = o.part1Done; if ('unlocked' in o) unlocked = o.unlocked; save(); toast('Saved'); renderTitle(); },
-    get charId() { return charId; }
+    get charId() { return charId; },
+    get diff() { return diff; }
   };
 })();
