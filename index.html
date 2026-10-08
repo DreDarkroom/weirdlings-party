@@ -44,9 +44,9 @@
     <button id="btnFull" aria-label="Fullscreen">⛶</button>
   </div>
 
-  <div id="touch" aria-hidden="true">
-    <div class="pad"><button data-act="left">◀</button><button data-act="right">▶</button></div>
-    <div class="acts"><button data-act="fire" class="b">FIRE</button><button data-act="jump" class="a">JUMP</button></div>
+  <div id="touch">
+    <div class="pad"><button data-act="left" aria-label="Left">◀</button><button data-act="right" aria-label="Right">▶</button></div>
+    <div class="acts"><button data-act="fire" class="b" aria-label="Fire">FIRE</button><button data-act="jump" class="a" aria-label="Jump">JUMP</button></div>
   </div>
 
   <!-- ===== TITLE ===== -->
@@ -112,7 +112,7 @@
       <p class="hint">Dee's memory is stuck at 3% (not adjustable). Reminder: <b class="cd"></b> until the party.</p>
       <label class="chk"><input id="setDev" type="checkbox"> 🛠 Developer mode (performance HUD, test tools, lab)</label>
       <div class="menu row"><button id="btnReset">Reset progress</button><button data-back>Back</button></div>
-      <p class="whisper">psst — Dee — party in <span class="cd"></span></p>
+      <p class="whisper" aria-hidden="true">psst — Dee — party in <span class="cd"></span></p>
     </div>
   </section>
 
@@ -135,7 +135,7 @@
       <p>Try experimental micro-games, give feedback, suggest ideas and write story lines in the Writers' Room.</p>
       <details><summary>Dee's survival tips</summary><p>1. Check the clock. 2. The clock is on every screen. 3. The party starts in <b class="cd"></b>. 4. Still reading? Go.</p></details>
       <div class="menu row"><button data-back>Back</button></div>
-      <p class="whisper">⏳ <span class="cd"></span> ⏳ (this line is hidden in plain sight, Dee)</p>
+      <p class="whisper" aria-hidden="true">⏳ <span class="cd"></span> ⏳ (this line is hidden in plain sight, Dee)</p>
     </div>
   </section>
   <section id="credits" class="screen" hidden>
