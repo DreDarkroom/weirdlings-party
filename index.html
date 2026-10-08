@@ -4,49 +4,33 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <title>Weirdlings: Road to Kerry's Party</title>
-<meta name="description" content="A 2D platform shooter for the Weirdlings Anti-AI Tribe. Get to Kerry Queenslayer's birthday party before Dee forgets his set, then party on at Mick Beach's. Countdown included.">
+<meta name="description" content="A 2D platform shooter for the Weirdlings Anti-AI Tribe. Get to Kerry Queenslayer's birthday party before Dee forgets the DJ set. Cake countdown included.">
 <meta name="theme-color" content="#12091f">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="style.css">
 </head>
 <body data-screen="title">
-<!-- Dee, if you are reading the source: the party starts in <span class="cd"></span> -->
+<!-- Dee, if you are reading the source: the cake is cut in <span class="cd"></span> -->
 <div id="cdBanner" role="timer" aria-live="off">
-  <span id="cdLabel" class="cdLabel">🎉 PARTY STARTS IN</span><b id="cdBig" class="cdBig">--:--:--</b>
+  <span class="cdLabel">🎂 DJ CAKE CUT IN</span><b class="cd cdBig">--:--:--</b>
   <span id="cdMsg"></span>
-</div>
-
-<div id="musicBar" role="region" aria-label="Music player">
-  <button id="mbPrev" aria-label="Previous track">⏮</button>
-  <button id="mbToggle" aria-label="Pause music">⏸</button>
-  <button id="mbNext" aria-label="Next track">⏭</button>
-  <span id="mbSrc" class="chip game">GAME</span>
-  <span id="mbNow" class="now" aria-live="polite">♪ …</span>
-  <button id="mbMute" aria-label="Mute music">🔊</button>
-  <input id="mbVol" type="range" min="0" max="1" step="0.05" aria-label="Music volume">
-  <button id="mbMore" aria-expanded="false" aria-controls="musicPanel">🎚 Music ▾</button>
-</div>
-<div id="musicPanel" hidden role="dialog" aria-label="Music options">
-  <div class="mpHead"><b>🎚 Music</b><button id="mpClose" aria-label="Close music options">✕</button></div>
-  <div id="mpBody"></div>
 </div>
 
 <div id="stage">
   <canvas id="game" aria-label="Game"></canvas>
   <div id="bubble" role="status"></div>
   <div id="toast" role="status"></div>
-  <div id="rotate">↻ Rotate your device to landscape for the best view<br><small>Party starts in <span class="cd"></span></small></div>
-  <div id="devHud" hidden aria-hidden="true"></div>
+  <div id="rotate">↻ Rotate your device to landscape for the best view<br><small>Cake in <span class="cd"></span></small></div>
 
   <div id="hudBtns">
     <button id="btnPause" aria-label="Pause">⏸</button>
     <button id="btnFull" aria-label="Fullscreen">⛶</button>
   </div>
 
-  <div id="touch">
-    <div class="pad"><button data-act="left" aria-label="Left">◀</button><button data-act="right" aria-label="Right">▶</button></div>
-    <div class="acts"><button data-act="fire" class="b" aria-label="Fire">FIRE</button><button data-act="jump" class="a" aria-label="Jump">JUMP</button></div>
+  <div id="touch" aria-hidden="true">
+    <div class="pad"><button data-act="left">◀</button><button data-act="right">▶</button></div>
+    <div class="acts"><button data-act="fire" class="b">FIRE</button><button data-act="jump" class="a">JUMP</button></div>
   </div>
 
   <!-- ===== TITLE ===== -->
@@ -54,110 +38,76 @@
     <div class="panel">
       <p class="eyebrow">The Weirdlings Anti-AI Tribe present</p>
       <h1>Road to <span>Kerry's Party</span></h1>
-      <p class="big">Get to the birthday. Don't let Dee forget his set.</p>
+      <p class="big">Get to the birthday. Cut the cake. Don't let Dee forget.</p>
       <div class="menu">
         <button id="btnPlay" class="primary">▶ New Game</button>
-        <button data-go="levels">Level Select</button>
-        <button id="btnPart2">🔒 Part 2</button>
-        <button data-go="setlist">🎧 Tonight's Set List</button>
-        <button data-go="dj">🎛 DJ Booth</button>
-        <button data-go="cakemaker">🎂 Cake·AI™ (totally AI)</button>
-        <button data-go="card">💌 Birthday Cards &amp; Sign Book</button>
-        <button data-go="workshop">🧪 Workshop &amp; Party Games</button>
+        <button id="btnContinue">Level Select</button>
         <button data-go="select">Choose Your Weirdling</button>
-        <button data-go="stats">📊 Stats</button>
+        <button data-go="dj">🎧 DJ Booth</button>
         <button data-go="settings">Settings</button>
         <button data-go="help">Help &amp; Controls</button>
         <button data-go="credits">Credits</button>
         <button id="btnIcs">📅 Add party to calendar</button>
-        <button data-go="devmenu" class="devonly">🛠 Developer</button>
       </div>
-      <p class="foot">Keyboard · Gamepad · Touch · PC, Mac, phone &amp; tablet</p>
+      <p class="foot">Keyboard · Gamepad · Touch · Works on PC, Mac, phone &amp; tablet</p>
     </div>
   </section>
 
-  <!-- ===== SELECT / LEVELS ===== -->
+  <!-- ===== SELECT ===== -->
   <section id="select" class="screen" hidden>
     <div class="panel wide">
       <h2>Choose your Weirdling</h2>
       <div id="chars" class="cards"></div>
       <div class="menu row"><button id="btnSelectGo" class="primary">Go to the party</button><button data-back>Back</button></div>
-      <p class="foot">Party starts in <b class="cd"></b></p>
+      <p class="foot">Cake cut in <b class="cd"></b></p>
     </div>
-  </section>
-  <section id="levels" class="screen" hidden>
-    <div class="panel"><h2>Level Select</h2><div id="levelList" class="menu"></div><div class="menu"><button data-go="select">Change character</button><button data-back>Back</button></div>
-    <p class="foot">Party starts in <b class="cd"></b></p></div>
   </section>
 
-  <!-- ===== SET LIST ===== -->
-  <section id="setlist" class="screen" hidden>
-    <div class="panel wide">
-      <h2>🎧 Tonight's Set List</h2>
-      <p class="muted">Friday 9 October 2026 · times shown in UK time. Each DJ is a playable Weirdling: tap "Play as" to join their set.</p>
-      <p class="big">Party starts in <b class="cd"></b></p>
-      <div id="setlistList" class="slots"></div>
-      <p class="muted">🎂 Cake-cutting time is TBC. Dizzle (now a cake) will be ready.</p>
-      <div class="menu row"><button data-go="dj" class="primary">🎛 Open the DJ Booth</button><button data-back>Back</button></div>
-    </div>
+  <section id="levels" class="screen" hidden>
+    <div class="panel"><h2>Level Select</h2><div id="levelList" class="menu"></div><div class="menu"><button data-go="select">Change character</button><button data-back>Back</button></div>
+    <p class="foot">Cake cut in <b class="cd"></b></p></div>
   </section>
 
   <!-- ===== SETTINGS ===== -->
   <section id="settings" class="screen" hidden>
     <div class="panel">
       <h2>Settings</h2>
-      <label>Music volume <input id="setMusic" type="range" min="0" max="1" step="0.05" title="Louder than Dee's memory (party starts in the banner above)"></label>
+      <label>Music volume <input id="setMusic" type="range" min="0" max="1" step="0.05" title="Louder than Dee's memory (cake in the countdown)"></label>
       <label>Sound effects <input id="setSfx" type="range" min="0" max="1" step="0.05"></label>
       <label class="chk"><input id="setTouch" type="checkbox"> On-screen touch controls</label>
       <label>Difficulty <select id="setDiff"><option value="0">Chill</option><option value="1">Normal</option><option value="2">Tribe-Hard</option></select></label>
-      <label>Dee's memory <input type="range" min="0" max="100" value="3" disabled title="Party starts in the banner above, Dee"></label>
-      <p class="hint">Dee's memory is stuck at 3% (not adjustable). Reminder: <b class="cd"></b> until the party.</p>
-      <label class="chk"><input id="setDev" type="checkbox"> 🛠 Developer mode (performance HUD, test tools, lab)</label>
-      <div class="menu row"><button id="btnResetAll" class="danger">Reset all data</button><button data-back>Back</button></div>
-      <p class="whisper" aria-hidden="true">psst — Dee — party in <span class="cd"></span></p>
+      <label>Dee's memory <input type="range" min="0" max="100" value="3" disabled title="Cake cut in the banner above, Dee"></label>
+      <p class="hint">Dee's memory is stuck at 3% (not adjustable). Reminder: <b class="cd"></b> until the cake.</p>
+      <div class="menu row"><button id="btnReset">Reset progress</button><button data-back>Back</button></div>
+      <p class="whisper">psst — Dee — cake in <span class="cd"></span></p>
     </div>
   </section>
 
-  <!-- ===== STATS ===== -->
-  <section id="stats" class="screen" hidden>
-    <div class="panel wide">
-      <h2>Stats</h2>
-      <p>Clankers shot: <b id="statKills">0</b></p>
-      <p>Vinyl collected: <b id="statVinyl">0</b></p>
-      <div id="statTimes"></div>
-      <div class="menu row"><button data-back>Back</button></div>
-      <p class="foot">Party starts in <b class="cd"></b></p>
-    </div>
-  </section>
-
-  <!-- ===== HELP / CREDITS ===== -->
+  <!-- ===== HELP ===== -->
   <section id="help" class="screen" hidden>
     <div class="panel wide">
       <h2>Help &amp; Controls</h2>
       <div class="cols">
-        <div><h3>Keyboard</h3><p>Move: <kbd>A</kbd><kbd>D</kbd> / arrows<br>Jump: <kbd>Space</kbd> / <kbd>K</kbd> (hold = higher)<br>Drop through platform: <kbd>S</kbd>+<kbd>Space</kbd><br>Fire: <kbd>J</kbd> / <kbd>X</kbd> (hold <kbd>W</kbd> to aim up)<br>Pause / back: <kbd>Esc</kbd></p></div>
+        <div><h3>Keyboard</h3><p>Move: <kbd>A</kbd><kbd>D</kbd> / arrows<br>Jump: <kbd>Space</kbd> / <kbd>K</kbd> (hold = higher)<br>Drop through platform: <kbd>S</kbd>+<kbd>Space</kbd><br>Fire: <kbd>J</kbd> / <kbd>X</kbd> (hold <kbd>W</kbd> to aim up)<br>Pause: <kbd>Esc</kbd></p></div>
         <div><h3>Gamepad</h3><p>Move: stick / d-pad<br>Jump: <kbd>A</kbd> / <kbd>B</kbd><br>Fire: <kbd>X</kbd> / <kbd>Y</kbd> / bumpers / <kbd>RT</kbd><br>Pause: Start<br>Menus: d-pad + A</p></div>
         <div><h3>Touch</h3><p>Left thumb: ◀ ▶<br>Right thumb: JUMP / FIRE<br>⏸ top right to pause. Landscape works best.</p></div>
       </div>
       <h3>Goal</h3>
-      <p>Part 1: reach the glowing party door in every level and beat the Overfit to reach Kerry's party. Part 2 (unlocked after Part 1): Mick Beach's birthday on a glitching beach. Collect vinyl for points, grab ♥ to heal, shoot every Clanker.</p>
-      <h3>Sign book &amp; card</h3>
-      <p>Leave a birthday wish for Kerry or Mick in the sign book. Your wish is pinned to their card.</p>
+      <p>Reach the glowing party door in every level. Collect vinyl for points, grab ♥ to heal, and shoot every Clanker (AI drone, bot or turret). Beat the Overfit to open the final gate. Then cut the cake in the DJ booth.</p>
       <h3>DJ Booth</h3>
       <p>Two decks mix CC0 tracks from <b>Stopiffy</b>, our parody streaming service: pick a track, <b>SYNC</b> the tempos, ride the crossfader, play with bass / treble, and loop 4 beats. Bo0m's Spotify panel embeds your own Spotify link (it can't be beat-matched; Spotify audio can't be mixed in a browser).</p>
-      <h3>Workshop</h3>
-      <p>Try experimental micro-games, give feedback, suggest ideas and write story lines in the Writers' Room.</p>
-      <details><summary>Dee's survival tips</summary><p>1. Check the clock. 2. The clock is on every screen. 3. The party starts in <b class="cd"></b>. 4. Still reading? Go.</p></details>
+      <details><summary>Dee's survival tips</summary><p>1. Check the clock. 2. The clock is on every screen. 3. The cake is in <b class="cd"></b>. 4. Still reading? Go.</p></details>
       <div class="menu row"><button data-back>Back</button></div>
-      <p class="whisper" aria-hidden="true">⏳ <span class="cd"></span> ⏳ (this line is hidden in plain sight, Dee)</p>
+      <p class="whisper">⏳ <span class="cd"></span> ⏳ (this line is hidden in plain sight, Dee)</p>
     </div>
   </section>
+
   <section id="credits" class="screen" hidden>
     <div class="panel">
       <h2>Credits</h2>
-      <p>Made for Kerry Queenslayer's birthday (and Mick Beach's) by the Weirdlings Anti-AI Tribe.<br>Music: <b>Stopiffy</b> (CC0, generated in-browser: no AI model, just maths and chaos).</p>
-      <p>Cast: DeeDarkgloom · Dizzle (a cake) · Bo0m / Lucky Salvage · Hypnotized / Ilian · Myster Y. Deep · Helix · Kerry Queenslayer · Mick Beach</p>
-      <p class="hint">Party starts in <b class="cd"></b>. Build v<span id="ver"></span></p>
+      <p>Made for Kerry Queenslayer's birthday by the Weirdlings Anti-AI Tribe.<br>Music: <b>Stopiffy</b> (CC0, generated in-browser, so no AI model involved, just maths and chaos).</p>
+      <p>Cast: DeeDarkgloom · Dizzle (a cake) · Bo0m / Lucky Salvage · Hypnotized / Ilian · Myster Y. Deep · Helix · Kerry Queenslayer</p>
+      <p class="hint">Cake cut in <b class="cd"></b>. Build v<span id="ver"></span></p>
       <div class="menu row"><button data-back>Back</button></div>
     </div>
   </section>
@@ -165,125 +115,28 @@
   <!-- ===== PAUSE / OVER ===== -->
   <section id="pause" class="screen" hidden>
     <div class="panel"><h2>Paused</h2>
-      <p class="big">Dee's pager: party in <b class="cd"></b></p>
-      <div class="menu"><button id="btnResume" class="primary">Resume</button><button id="btnRestart">Restart level</button><button data-go="settings">Settings</button><button data-go="help">Help</button><button data-go="devmenu" class="devonly">🛠 Developer</button><button id="btnQuit">Quit to title</button></div>
+      <p class="big">Dee's pager: cake in <b class="cd"></b></p>
+      <div class="menu"><button id="btnResume" class="primary">Resume</button><button id="btnRestart">Restart level</button><button data-go="settings">Settings</button><button data-go="help">Help</button><button id="btnQuit">Quit to title</button></div>
     </div>
   </section>
   <section id="over" class="screen" hidden>
-    <div class="panel"><h2>Glitched Out</h2><p>Score <b id="overScore">0</b>. The Simulation wins this round. But the party starts in <b class="cd"></b>!</p>
+    <div class="panel"><h2>Glitched Out</h2><p>Score <b id="overScore">0</b>. The Simulation wins this round. But the cake gets cut in <b class="cd"></b>!</p>
       <div class="menu"><button id="btnRetry" class="primary">Try again</button><button id="btnOverMenu">Title</button></div></div>
   </section>
 
   <!-- ===== PARTY / DJ ===== -->
   <section id="party" class="screen" hidden>
     <div class="panel"><div id="confetti"></div>
-      <h2 id="partyTitle">🎉 Happy Birthday! 🎉</h2>
+      <h2>🎉 Happy Birthday Kerry! 🎉</h2>
       <p class="big">You made it. Score <b id="finalScore">0</b>.</p>
-      <p id="partyText"></p>
-      <div class="menu">
-        <button id="btnPartySign" class="primary">✍ Sign the book</button>
-        <button data-go="cakemaker">🎂 Cake studio (draw on the cake)</button>
-        <button id="btnPartyCard">💌 See the birthday card</button>
-        <button id="btnPartyDJ">🎛 Open the DJ Booth</button>
-        <button id="btnPartyNext">🏖 Continue: Mick's Beach Party</button>
-        <button data-go="title">Title</button>
-      </div>
-      <p class="foot">Party starts in <b class="cd"></b></p></div>
+      <p>Dizzle (now a cake) is on the decks. DJs, step up!</p>
+      <div class="menu"><button id="btnPartyDJ" class="primary">🎧 Open the DJ Booth</button><button data-go="title">Title</button></div>
+      <p class="foot">Cake cut in <b class="cd"></b></p></div>
   </section>
   <section id="dj" class="screen" hidden>
-    <div class="djwrap"><div class="djhead"><h2>🎛 DJ Booth</h2><button data-back>Back</button></div>
-      <p class="muted">Deck tracks by <b>Stopiffy</b> (CC0). Party starts in <b class="cd"></b></p>
+    <div class="djwrap"><div class="djhead"><h2>🎧 DJ Booth</h2><button data-back>Back</button></div>
+      <p class="muted">Deck tracks by <b>Stopiffy</b> (CC0). Cake cut in <b class="cd"></b></p>
       <div id="djRoot"></div></div>
-  </section>
-
-  <!-- ===== CAKE·AI ===== -->
-  <section id="cakemaker" class="screen" hidden>
-    <div class="panel wide">
-      <div class="djhead"><h2>🎂 Cake·AI™</h2><button data-back>Back</button></div>
-      <div id="ckChat" class="chat" aria-live="polite"></div>
-      <div class="menu row"><input id="ckPrompt" maxlength="140" placeholder="Describe the picture… (or just press the button)" aria-label="Describe the picture"><button id="ckGo" class="primary">✨ Generate with AI</button><button id="ckBlank">Draw my own</button></div>
-      <div id="ckProgress" hidden><div class="bar"><i id="ckBar"></i></div><small id="ckStatus"></small></div>
-      <div class="ckstage"><canvas id="ckCanvas" width="800" height="560" aria-label="Cake canvas. Draw with mouse, touch or stylus."></canvas><div id="ckCursor"></div><div id="ckNozzle">🖌</div></div>
-      <div id="ckTools" hidden>
-        <div id="ckPalette" class="palette" role="group" aria-label="Icing colours"></div>
-        <div class="menu row"><button id="ckPen" class="on">🖊 Pipe</button><button id="ckErase">🧽 Erase</button><label class="inl">Size <input id="ckSize" type="range" min="3" max="22" value="7"></label></div>
-        <div class="menu row"><button id="ckUndo">↶ Undo</button><button id="ckRedo">↷ Redo</button><button id="ckClear">Clear</button><button id="ckReplay">▶ Replay</button><button id="ckSkip">Skip</button></div>
-        <div class="menu row"><button id="ckSave" class="primary">⬇ Save PNG</button><button id="ckCard">💌 Put on the card</button></div>
-        <p class="hint">Stylus: pressure = icing thickness, tilt = broader nozzle, eraser end or barrel button = rub out. Resting your palm is ignored while the pen is in use.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== SIGN BOOK + CARD ===== -->
-  <section id="card" class="screen" hidden>
-    <div class="panel wide cardpanel">
-      <div id="cardTabs" class="tabs"><button data-to="kerry">Kerry</button><button data-to="mick">Mick</button></div>
-      <div id="cardInner" class="cardwrap">
-        <div id="cardCover" class="cover" role="button" tabindex="0" aria-label="Open the card"><div class="coverart">🎂</div><h2 id="cardTitle">Happy Birthday!</h2><small>tap to open</small></div>
-        <div class="inside"><div id="cardNotes" class="notes"></div></div>
-      </div>
-      <p id="cardMode" class="muted"></p>
-      <div class="menu row"><button id="btnSignFromCard" class="primary">✍ Sign the book</button><button data-back>Back</button></div>
-    </div>
-  </section>
-  <section id="signbook" class="screen" hidden>
-    <div class="panel">
-      <h2>✍ Sign the Book</h2>
-      <form id="signForm" autocomplete="off">
-        <label>For <select id="signTo"><option value="kerry">Kerry</option><option value="mick">Mick</option></select></label>
-        <label>Your name <input id="signName" maxlength="40" placeholder="e.g. Dee (who remembered)"></label>
-        <label class="col">Your wish <textarea id="signMsg" maxlength="280" rows="4" placeholder="Happy birthday!…" required></textarea></label>
-        <div class="muted" id="signCount">0/280</div>
-        <div id="emojiPick" class="emoji" role="group" aria-label="Pick a sticker"></div>
-        <div class="menu row"><button type="submit" class="primary">💌 Sign it</button><button type="button" data-back>Back</button></div>
-      </form>
-    </div>
-  </section>
-
-  <!-- ===== WORKSHOP / LAB ===== -->
-  <section id="workshop" class="screen" hidden>
-    <div class="panel wide">
-      <h2>🧪 Workshop &amp; Party Games</h2>
-      <p class="muted">Micro-games and experiments straight from the lab. Play them, vote, and tell us what to build next.</p>
-      <div id="workshopList" class="wgrid"></div>
-      <div class="menu row"><button data-go="writers">✍ Writers' Room (write story lines)</button><button id="btnIdea">💡 Suggest an idea</button><button data-go="devlab" class="devonly">🧪 Dev Lab</button><button data-back>Back</button></div>
-    </div>
-  </section>
-  <section id="micro" class="screen" hidden>
-    <div class="panel wide"><div class="djhead"><h2 id="microTitle">Micro-game</h2><b id="microScore"></b><button id="microQuit">Quit</button></div><div id="microHost" class="microhost"></div></div>
-  </section>
-  <section id="feedback" class="screen" hidden>
-    <div class="panel">
-      <h2>💬 Feedback &amp; ideas</h2>
-      <label>Type <select id="fbKind"><option value="feedback">Feedback</option><option value="idea">Idea / suggestion</option><option value="bug">Bug</option><option value="narrative">Story / text</option></select></label>
-      <label>Title <input id="fbTitle" maxlength="100"></label>
-      <label class="col">Details <textarea id="fbBody" rows="5" maxlength="2000"></textarea></label>
-      <div class="menu row"><button id="fbSend" class="primary">Send</button><button data-back>Cancel</button></div>
-    </div>
-  </section>
-  <section id="writers" class="screen" hidden>
-    <div class="panel wide">
-      <h2>✍ Writers' Room</h2>
-      <p class="muted">Rewrite any scene. One line per row, written as <code>Speaker: text</code>. Use <code>{t}</code> for the live countdown. Preview it in the real dialogue box, then send it in.</p>
-      <label>Scene <select id="wrScene"></select></label>
-      <textarea id="wrText" rows="9" class="mono" aria-label="Scene lines"></textarea>
-      <div class="menu row"><button id="wrPreview" class="primary">▶ Preview</button><button id="wrCopy">Copy JSON</button><button id="wrSend">Send to the team</button><button data-back>Back</button></div>
-    </div>
-  </section>
-
-  <!-- ===== DEVELOPER ===== -->
-  <section id="devmenu" class="screen" hidden>
-    <div class="panel wide"><div class="djhead"><h2>🛠 Developer</h2><button data-back>Back</button></div><div id="devRoot"></div></div>
-  </section>
-  <section id="devlab" class="screen" hidden>
-    <div class="panel wide">
-      <div class="djhead"><h2>🧪 Dev Lab</h2><button data-back>Back</button></div>
-      <p class="muted">Build a micro-game and run it in a sandbox. When it's good, export it and open a PR (see CONTRIBUTING.md), and it can go live in the real game.</p>
-      <div class="menu row"><input id="dlName" placeholder="Game name" maxlength="40"><select id="dlSaved"></select></div>
-      <textarea id="dlCode" rows="12" class="mono" spellcheck="false" aria-label="Micro-game code"></textarea>
-      <div class="menu row"><button id="dlRun" class="primary">▶ Run</button><button id="dlSave">Save draft</button><button id="dlExport">Export .js</button></div>
-      <iframe id="dlFrame" title="Sandbox" sandbox="allow-scripts" class="sandbox"></iframe>
-    </div>
   </section>
 
   <!-- ===== DIALOGUE ===== -->
@@ -294,22 +147,15 @@
   </div>
 </div>
 
-<noscript>This game needs JavaScript. Dee needs a clock: the party starts at 7pm UK time, Friday 9 October 2026.</noscript>
+<noscript>This game needs JavaScript. Dee needs a clock: the cake is cut Friday 9 October 2026.</noscript>
 <script src="js/config.js"></script>
 <script src="js/countdown.js"></script>
-<script src="js/storage.js"></script>
-<script src="js/setlist.js"></script>
 <script src="js/stopiffy.js"></script>
 <script src="js/input.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/spotify.js"></script>
 <script src="js/dj.js"></script>
 <script src="js/game.js"></script>
-<script src="js/dev.js"></script>
-<script src="js/cake.js"></script>
-<script src="js/wishes.js"></script>
-<script src="js/lab.js"></script>
-<script src="js/music.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/main.js"></script>
 <script>document.getElementById('ver').textContent = WL.CONFIG.version;</script>

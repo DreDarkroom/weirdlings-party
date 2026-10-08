@@ -10,11 +10,7 @@ WL.Spotify = (function () {
     return m ? { type: m[1], id: m[2] } : null;
   }
   function embedSrc(url) { var p = parse(url); return p ? 'https://open.spotify.com/embed/' + p.type + '/' + p.id + '?theme=0' : null; }
-  function remembered() { return WL.Storage.load().spotify || ''; }
-  function remember(u) {
-    var data = WL.Storage.load();
-    data.spotify = u;
-    WL.Storage.save(data);
-  }
+  function remembered() { try { return localStorage.getItem(KEY) || ''; } catch (e) { return ''; } }
+  function remember(u) { try { localStorage.setItem(KEY, u); } catch (e) {} }
   return { parse: parse, embedSrc: embedSrc, remembered: remembered, remember: remember, hasOAuth: function () { return !!WL.CONFIG.spotifyClientId; } };
 })();

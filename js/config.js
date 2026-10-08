@@ -1,20 +1,12 @@
-﻿window.WL = window.WL || {};
+window.WL = window.WL || {};
 WL.CONFIG = {
-  // Everything is defined in UK time (the party's local time). The +01:00 offset (BST) makes the
-  // countdown identical for every player, whatever their own time zone.
-  tz: 'Europe/London',
-  partyISO: '2026-10-09T19:00:00+01:00',      // 7pm Fri 9 Oct 2026: Bo0m's Spotify playlist kicks the night off
-  partyEndISO: '2026-10-10T01:00:00+01:00',   // last set ends 1am
-  part2ISO: '',                                // Mick Beach's birthday party: date TBC (leave '' until known)
+  // The moment the DJ cake is cut. Interpreted in each player's LOCAL time zone.
+  // TODO(party-time): confirm real start time with Kerry/Dee. 20:00 is a guess.
+  partyISO: '2026-10-09T20:00:00',
   honoree: 'Kerry Queenslayer',
   // Deployed Stopiffy origin (empty = use the bundled catalogue).
   stopiffyBase: 'https://dredarkroom.github.io/stopiffy',
-  // Shared wishes/feedback API (Cloudflare Worker in /backend). Empty = wishes stay on this device.
-  apiBase: 'https://weirdlings-wishes.andreas-93f.workers.dev',
-  // Where "send feedback / suggest an idea" links open a pre-filled GitHub issue.
-  issuesRepo: 'DreDarkroom/weirdlings-party',
   // Spotify app client id (PKCE flow, not yet wired). Empty = embed-only mode.
   spotifyClientId: '',
-  version: '0.2.0'
+  version: '0.1.0'
 };
-

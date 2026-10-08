@@ -15,11 +15,7 @@ WL.Game = (function () {
   var LEVELS = [
     { name: 'Tribe Trail',          seed: 11, cols: 110, gapEvery: 20, maxGap: 4, enemyEvery: 9, sky: ['#1b0b3a', '#7a1fa2'], neon: '#ff4fd8', ground: '#2a1450', bgm: 'weirdling-walk', glitch: 0 },
     { name: 'Glitch Highway',       seed: 22, cols: 140, gapEvery: 15, maxGap: 4, enemyEvery: 7, sky: ['#021522', '#0b6a8f'], neon: '#38f2c1', ground: '#0b2a3a', bgm: 'glitch-highway', glitch: 1 },
-    { name: 'The Overfit Gate',     seed: 33, cols: 90,  gapEvery: 16, maxGap: 3, enemyEvery: 7, sky: ['#1a0000', '#8a1c1c'], neon: '#ffd23f', ground: '#3a1010', bgm: 'overfit-boss',   glitch: 2, boss: true },
-    // ---- Part 2: Mick Beach's birthday ----
-    { name: 'Shoreline Shuffle',    seed: 44, cols: 120, gapEvery: 18, maxGap: 4, enemyEvery: 8, sky: ['#ff7e5f', '#5b2a86'], neon: '#ffd23f', ground: '#7a5a2b', bgm: 'shoreline-shuffle', glitch: 0, part: 2, beach: true },
-    { name: 'Pier Pressure',        seed: 55, cols: 150, gapEvery: 14, maxGap: 4, enemyEvery: 7, sky: ['#0f2027', '#2c5364'], neon: '#38f2c1', ground: '#3b2f1d', bgm: 'pier-pressure',     glitch: 1, part: 2, beach: true },
-    { name: 'The Tidal Overfit',    seed: 66, cols: 90,  gapEvery: 16, maxGap: 3, enemyEvery: 7, sky: ['#232526', '#c0392b'], neon: '#ffd23f', ground: '#3a2a12', bgm: 'overfit-boss',      glitch: 2, boss: true, bossName: 'TIDAL OVERFIT', part: 2, beach: true }
+    { name: 'The Overfit Gate',     seed: 33, cols: 90,  gapEvery: 16, maxGap: 3, enemyEvery: 7, sky: ['#1a0000', '#8a1c1c'], neon: '#ffd23f', ground: '#3a1010', bgm: 'overfit-boss',   glitch: 2, boss: true }
   ];
 
   function rng(seed) { var a = seed >>> 0; return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; var t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
@@ -27,11 +23,6 @@ WL.Game = (function () {
 
   // ---------------------------------------------------------------- state
   var S = null, running = false, paused = false, last = 0, tAll = 0, onEnd = null, attractX = 0, shake = 0;
-  var reducedMotion = false;
-  if (window.matchMedia) {
-    reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', function(e) { reducedMotion = e.matches; });
-  }
 
   function build(li) {
     var spec = LEVELS[li], r = rng(spec.seed);
@@ -143,7 +134,6 @@ WL.Game = (function () {
     for (var i = 0; i < n; i++) { var a = Math.random() * 6.283, s = (0.3 + Math.random()) * (spd || 200); S.parts.push({ x: x, y: y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 60, life: 0.5 + Math.random() * 0.5, color: color, size: 2 + Math.random() * 3 }); }
   }
   function confetti(n) {
-    if (reducedMotion) return;
     var cols = ['#ff4fd8', '#38f2c1', '#ffd23f', '#8b5cf6', '#f43f5e'];
     for (var i = 0; i < n; i++) S.parts.push({ x: Math.random() * W + (S.cam || 0), y: -10 - Math.random() * 200, vx: (Math.random() - 0.5) * 60, vy: 60 + Math.random() * 120, life: 4 + Math.random() * 3, color: cols[i % 5], size: 3 + Math.random() * 4, g: 0 });
   }
@@ -165,17 +155,16 @@ WL.Game = (function () {
     WL.Audio.sfx('shoot');
   }
   function hurtPlayer(p, from, dmg) {
-    if (WL.Dev && WL.Dev.flags.god) return;
     if (p.inv > 0 || S.state !== 'play') return;
     if (p.ch.luck && Math.random() < p.ch.luck) { p.inv = 0.6; WL.UI.say('Lucky! Salvaged that one.'); burst(p.x + 10, p.y + 10, '#ffd23f', 10); return; }
-    p.hp -= (dmg || 1); p.inv = 1.8; p.vy = -320; p.vx = (p.x < from ? -1 : 1) * 150; if (!reducedMotion) shake = 0.25;
+    p.hp -= (dmg || 1); p.inv = 1.8; p.vy = -320; p.vx = (p.x < from ? -1 : 1) * 150; shake = 0.25;
     WL.Audio.sfx('hurt'); burst(p.x + 10, p.y + 14, '#ff4d6d', 12);
     if (p.hp <= 0) { S.state = 'dead'; S.endT = 0; burst(p.x + 10, p.y + 14, p.ch.color, 40, 300); WL.Audio.sfx('boom'); }
   }
   function killEnemy(e) {
     e.dead = true; S.score += e.pts; S.kills++; WL.Audio.sfx('boom'); burst(e.x + e.w / 2, e.y + e.h / 2, e.type === 'boss' ? '#ffd23f' : '#ff7a59', e.type === 'boss' ? 80 : 18, e.type === 'boss' ? 400 : 220);
     if (Math.random() < 0.18 && e.type !== 'boss') S.items.push({ type: 'heart', x: e.x, y: e.y });
-    if (e.type === 'boss') { S.goal.open = true; if (!reducedMotion) shake = 0.8; WL.UI.say('The Overfit overheated! The gate to the party is open!'); }
+    if (e.type === 'boss') { S.goal.open = true; shake = 0.8; WL.UI.say('The Overfit overheated! The gate to the party is open!'); }
   }
 
   // ---------------------------------------------------------------- update
@@ -192,7 +181,10 @@ WL.Game = (function () {
       if (p.buf > 0 && p.coyote > 0) { p.vy = -700; p.buf = 0; p.coyote = 0; WL.Audio.sfx('jump'); }
       if (!I.jump && p.vy < -220) p.vy += 2600 * dt;
       p.drop = I.down && I.jump;
-      p.vy = Math.min(p.vy + 1800 * dt, 900);
+      var grav = p.vy > 0 ? 2200 : 1600;
+      if (Math.abs(p.vy) < 100 && I.jump) grav = 800;
+      if (!I.jump && p.vy < 0) grav = 3000;
+      p.vy = Math.min(p.vy + grav * dt, 900);
       moveX(p, p.vx * dt); moveY(p, p.vy * dt);
       if (p.y > ROWS * T + 60) { p.inv = 0; hurtPlayer(p, p.x); if (S.state === 'play') { p.x = p.safe.x; p.y = p.safe.y; p.vx = p.vy = 0; p.inv = 1.5; } }
       if (p.onGround && (p.safeT -= dt) <= 0) {
@@ -310,7 +302,6 @@ WL.Game = (function () {
     for (var i = 0; i < stars.length; i++) { var s = stars[i]; cx.fillRect(((s[0] - cam * 0.05) % 1400 + 1400) % 1400 % W, s[1], s[2], s[2]); }
     // moon
     cx.fillStyle = 'rgba(255,240,255,.85)'; cx.beginPath(); cx.arc(780, 90, 34, 0, 6.283); cx.fill();
-    if (spec.beach) { beachBg(spec, cam, t); return; }
     // skylines
     for (var layer = 0; layer < 2; layer++) {
       var par = layer ? 0.5 : 0.25, bw = layer ? 80 : 110, base = layer ? H - 120 : H - 190;
@@ -321,19 +312,6 @@ WL.Game = (function () {
         cx.fillRect(b * bw - off, base + (layer ? 40 : 0) - bh + 100, bw - 6, bh + 200);
         if (hsh > 0.5) { cx.fillStyle = spec.neon; cx.globalAlpha = 0.5; cx.fillRect(b * bw - off, base + (layer ? 40 : 0) - bh + 100, bw - 6, 2); cx.globalAlpha = 1; cx.fillStyle = layer ? 'rgba(10,5,25,.75)' : 'rgba(30,10,60,.55)'; }
       }
-    }
-  }
-  function beachBg(spec, cam, t) {
-    var sun = cx.createRadialGradient(700, 300, 10, 700, 300, 150); sun.addColorStop(0, 'rgba(255,240,170,.95)'); sun.addColorStop(1, 'rgba(255,200,120,0)');
-    cx.fillStyle = sun; cx.fillRect(500, 120, 400, 400);
-    cx.fillStyle = 'rgba(255,236,160,.95)'; cx.beginPath(); cx.arc(700, 300, 44, 0, 6.283); cx.fill();
-    cx.fillStyle = 'rgba(15,45,100,.55)'; cx.fillRect(0, 330, W, H - 330);
-    cx.strokeStyle = 'rgba(255,255,255,.18)'; cx.lineWidth = 2;
-    for (var i = 0; i < 6; i++) { cx.beginPath(); for (var x = 0; x <= W; x += 20) { var y = 345 + i * 22 + Math.sin(x / 40 + t * 1.2 + i) * 3; if (x) cx.lineTo(x, y); else cx.moveTo(x, y); } cx.stroke(); }
-    for (var k = 0; k < 7; k++) {
-      var px = (((k * 230 - cam * 0.45) % 1610) + 1610) % 1610 - 120, base = 400;
-      cx.strokeStyle = 'rgba(25,12,35,.85)'; cx.lineWidth = 7; cx.beginPath(); cx.moveTo(px, base); cx.quadraticCurveTo(px + 18, base - 70, px + 8, base - 130); cx.stroke();
-      cx.lineWidth = 4; for (var l = -2; l <= 2; l++) { cx.beginPath(); cx.moveTo(px + 8, base - 130); cx.quadraticCurveTo(px + 8 + l * 22, base - 160 + Math.abs(l) * 8, px + 8 + l * 38, base - 120 + Math.abs(l) * 14 + Math.sin(t * 1.5 + k) * 3); cx.stroke(); }
     }
   }
   function drawPerson(x, y, w, h, face, ch, anim, moving, alpha) {
@@ -369,7 +347,7 @@ WL.Game = (function () {
       cx.fillStyle = f ? '#fff' : '#3a3f4b'; cx.beginPath(); cx.ellipse(0, 0, 46, 38, 0, 0, 6.283); cx.fill();
       cx.strokeStyle = '#ffd23f'; cx.lineWidth = 3; cx.stroke();
       cx.fillStyle = '#ff2e63'; cx.beginPath(); cx.arc(0, -4, 14 + Math.sin(t * 6) * 2, 0, 6.283); cx.fill();
-      cx.fillStyle = '#fff'; cx.font = 'bold 12px monospace'; cx.textAlign = 'center'; cx.fillText(S.spec.bossName || 'OVERFIT', 0, 28);
+      cx.fillStyle = '#fff'; cx.font = 'bold 12px monospace'; cx.textAlign = 'center'; cx.fillText('OVERFIT', 0, 28);
       cx.fillStyle = '#000a'; cx.fillRect(-44, -56, 88, 8); cx.fillStyle = '#ff2e63'; cx.fillRect(-44, -56, 88 * Math.max(0, e.hp / e.maxhp), 8);
     }
     cx.restore();
@@ -422,10 +400,6 @@ WL.Game = (function () {
     if (S.state !== 'dead') drawPerson(p.x, p.y, p.w, p.h, p.face, p.ch, p.anim, Math.abs(p.vx) > 20 && p.onGround, p.inv > 0 && Math.floor(t * 20) % 2 ? 0.4 : 1);
     S.bullets.forEach(function (b) { cx.fillStyle = b.color; cx.beginPath(); cx.arc(b.x, b.y, b.r, 0, 6.283); cx.fill(); cx.globalAlpha = 0.3; cx.beginPath(); cx.arc(b.x - b.vx * 0.02, b.y - b.vy * 0.02, b.r * 1.6, 0, 6.283); cx.fill(); cx.globalAlpha = 1; });
     S.ebullets.forEach(function (b) { cx.fillStyle = '#ff2e63'; cx.beginPath(); cx.arc(b.x, b.y, 5, 0, 6.283); cx.fill(); cx.strokeStyle = '#fff'; cx.lineWidth = 1; cx.stroke(); });
-    if (WL.Dev && WL.Dev.flags.hitboxes) {
-      cx.lineWidth = 1; cx.strokeStyle = '#38f2c1'; cx.strokeRect(p.x, p.y, p.w, p.h);
-      cx.strokeStyle = '#ff4d6d'; S.enemies.forEach(function (e) { cx.strokeRect(e.x, e.y, e.w, e.h); }); cx.strokeRect(S.goal.x, S.goal.y, S.goal.w, S.goal.h);
-    }
     S.parts.forEach(function (q) { cx.globalAlpha = Math.min(1, q.life * 2); cx.fillStyle = q.color; cx.fillRect(q.x, q.y, q.size, q.size); }); cx.globalAlpha = 1;
     if (location.search.indexOf('debug=1') > -1) {
       cx.strokeStyle = '#0f0'; cx.lineWidth = 1;
@@ -437,7 +411,7 @@ WL.Game = (function () {
     }
     cx.restore();
     // glitch overlay
-    if (!reducedMotion && spec.glitch && Math.random() < 0.06 * spec.glitch) { for (var gi = 0; gi < 3; gi++) { cx.fillStyle = Math.random() < 0.5 ? 'rgba(255,0,200,.18)' : 'rgba(0,255,230,.18)'; cx.fillRect(0, Math.random() * H, W, 4 + Math.random() * 14); } }
+    if (spec.glitch && Math.random() < 0.06 * spec.glitch) { for (var gi = 0; gi < 3; gi++) { cx.fillStyle = Math.random() < 0.5 ? 'rgba(255,0,200,.18)' : 'rgba(0,255,230,.18)'; cx.fillRect(0, Math.random() * H, W, 4 + Math.random() * 14); } }
     hud(t);
   }
   function hud(t) {
@@ -465,10 +439,8 @@ WL.Game = (function () {
   // ---------------------------------------------------------------- loop
   function frame(ts) {
     requestAnimationFrame(frame);
-    var rawDt = Math.min(0.05, (ts - last) / 1000 || 0); last = ts; tAll += rawDt;
-    if (WL.Dev) WL.Dev.frame(rawDt * 1000);
-    var dt = rawDt * (WL.Dev ? WL.Dev.flags.timeScale : 1);
-    if (location.search.indexOf('debug=1') > -1 && S) S.fps = rawDt ? 1 / rawDt : 0;
+    var dt = Math.min(0.05, (ts - last) / 1000 || 0); last = ts; tAll += dt;
+    if (location.search.indexOf('debug=1') > -1 && S) S.fps = 1 / dt;
     WL.Input.update();
     if (WL.UI && WL.UI.nav) WL.UI.nav();
     if (running && !paused) {
@@ -496,12 +468,6 @@ WL.Game = (function () {
     },
     stop: function () { running = false; S = null; },
     pause: function (v) { paused = v; },
-    dev: {
-      win: function () { if (S && S.state === 'play') { S.state = 'win'; S.endT = 0; WL.Audio.sfx('win'); confetti(120); } },
-      killBoss: function () { if (S && S.boss && !S.boss.dead) { S.boss.hp = 0; killEnemy(S.boss); } },
-      spawn: function (n) { if (!S) return; for (var i = 0; i < n; i++) { var d = mk('drone', S.player.x + 160 + i * 60, 140 + (i % 3) * 50); d.y0 = d.y; S.enemies.push(d); } },
-      heal: function () { if (S) S.player.hp = S.player.maxhp; }
-    },
     step: function (dt) { WL.Input.update(); update(dt); },  // test hook: advance simulation without rAF
     get running() { return running; },
     get state() { return S; },
