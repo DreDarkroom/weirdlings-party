@@ -65,6 +65,7 @@
         <button data-go="card">💌 Birthday Cards &amp; Sign Book</button>
         <button data-go="workshop">🧪 Workshop &amp; Party Games</button>
         <button data-go="select">Choose Your Weirdling</button>
+        <button data-go="stats">📊 Stats</button>
         <button data-go="settings">Settings</button>
         <button data-go="help">Help &amp; Controls</button>
         <button data-go="credits">Credits</button>
@@ -111,8 +112,20 @@
       <label>Dee's memory <input type="range" min="0" max="100" value="3" disabled title="Party starts in the banner above, Dee"></label>
       <p class="hint">Dee's memory is stuck at 3% (not adjustable). Reminder: <b class="cd"></b> until the party.</p>
       <label class="chk"><input id="setDev" type="checkbox"> 🛠 Developer mode (performance HUD, test tools, lab)</label>
-      <div class="menu row"><button id="btnReset">Reset progress</button><button data-back>Back</button></div>
+      <div class="menu row"><button id="btnResetAll" class="danger">Reset all data</button><button data-back>Back</button></div>
       <p class="whisper" aria-hidden="true">psst — Dee — party in <span class="cd"></span></p>
+    </div>
+  </section>
+
+  <!-- ===== STATS ===== -->
+  <section id="stats" class="screen" hidden>
+    <div class="panel wide">
+      <h2>Stats</h2>
+      <p>Clankers shot: <b id="statKills">0</b></p>
+      <p>Vinyl collected: <b id="statVinyl">0</b></p>
+      <div id="statTimes"></div>
+      <div class="menu row"><button data-back>Back</button></div>
+      <p class="foot">Party starts in <b class="cd"></b></p>
     </div>
   </section>
 
@@ -283,6 +296,7 @@
 <noscript>This game needs JavaScript. Dee needs a clock: the party starts at 7pm UK time, Friday 9 October 2026.</noscript>
 <script src="js/config.js"></script>
 <script src="js/countdown.js"></script>
+<script src="js/storage.js"></script>
 <script src="js/setlist.js"></script>
 <script src="js/stopiffy.js"></script>
 <script src="js/input.js"></script>

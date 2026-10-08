@@ -99,7 +99,7 @@ WL.Dev = (function () {
 
     g = group('Diagnostics');
     var pre = document.createElement('pre'); pre.className = 'devpre'; pre.textContent = 'Press "Refresh" to snapshot.';
-    g.appendChild(row([btn('Refresh stats', function () { pre.textContent = JSON.stringify(snapshot(), null, 2); }), btn('Copy debug report', function () { var r = JSON.stringify({ snapshot: snapshot(), flags: flags, save: localStorage.getItem('wl.save') }, null, 2); (navigator.clipboard ? navigator.clipboard.writeText(r) : Promise.reject()).then(function () { WL.UI.toast('Debug report copied'); }, function () { pre.textContent = r; }); })]));
+    g.appendChild(row([btn('Refresh stats', function () { pre.textContent = JSON.stringify(snapshot(), null, 2); }), btn('Copy debug report', function () { var r = JSON.stringify({ snapshot: snapshot(), flags: flags, save: localStorage.getItem('wl.data') }, null, 2); (navigator.clipboard ? navigator.clipboard.writeText(r) : Promise.reject()).then(function () { WL.UI.toast('Debug report copied'); }, function () { pre.textContent = r; }); })]));
     g.appendChild(pre); root.appendChild(g);
   }
   function el(tag, cls, txt) { var e = document.createElement(tag); e.className = cls; e.textContent = txt; return e; }
