@@ -100,12 +100,18 @@ WL.Game = (function () {
       score: 0, vinyl: 0, time: 0, kills: 0, state: 'play', endT: 0
     };
   }
+  function getDiff() { return (WL.UI && WL.UI.diff !== undefined) ? WL.UI.diff : 1; }
+
   function mk(type, x, y) {
     var base = { type: type, x: x, y: y, vx: 0, vy: 0, dir: -1, t: Math.random() * 6, cd: 1 + Math.random(), flash: 0, dead: false };
-    if (type === 'walker') return Object.assign(base, { w: 26, h: 28, hp: 3, vx: -55, pts: 100 });
-    if (type === 'drone')  return Object.assign(base, { w: 28, h: 22, hp: 2, y0: y, pts: 80 });
-    if (type === 'turret') return Object.assign(base, { w: 28, h: 28, hp: 4, pts: 150 });
-    return Object.assign(base, { w: 92, h: 78, hp: 40, maxhp: 40, pts: 1000, y0: y, active: false, summon: 4 });
+    var obj;
+    if (type === 'walker') obj = Object.assign(base, { w: 26, h: 28, hp: 3, vx: -55, pts: 100 });
+    else if (type === 'drone') obj = Object.assign(base, { w: 28, h: 22, hp: 2, y0: y, pts: 80 });
+    else if (type === 'turret') obj = Object.assign(base, { w: 28, h: 28, hp: 4, pts: 150 });
+    else obj = Object.assign(base, { w: 92, h: 78, hp: 40, maxhp: 40, pts: 1000, y0: y, active: false, summon: 4, pattern: 0 });
+    obj.hp = Math.max(1, Math.floor(obj.hp * [0.6, 1, 1.5][getDiff()]));
+    if (obj.maxhp) obj.maxhp = obj.hp;
+    return obj;
   }
   function mkPlayer(ch) {
     return { x: 2 * T, y: (GROUND - 1) * T - 4, w: 22, h: 30, vx: 0, vy: 0, face: 1, onGround: false, coyote: 0, buf: 0, cd: 0, inv: 0, hp: ch.hp, maxhp: ch.hp, safe: { x: 2 * T, y: (GROUND - 1) * T - 4 }, safeT: 0, ch: ch, anim: 0 };
@@ -158,11 +164,11 @@ WL.Game = (function () {
     else bullet(a);
     WL.Audio.sfx('shoot');
   }
-  function hurtPlayer(p, from) {
+  function hurtPlayer(p, from, dmg) {
     if (WL.Dev && WL.Dev.flags.god) return;
     if (p.inv > 0 || S.state !== 'play') return;
     if (p.ch.luck && Math.random() < p.ch.luck) { p.inv = 0.6; WL.UI.say('Lucky! Salvaged that one.'); burst(p.x + 10, p.y + 10, '#ffd23f', 10); return; }
-    p.hp--; p.inv = 1.3; p.vy = -320; p.vx = (p.x < from ? -1 : 1) * 260; if (!reducedMotion) shake = 0.25;
+    p.hp -= (dmg || 1); p.inv = 1.8; p.vy = -320; p.vx = (p.x < from ? -1 : 1) * 150; if (!reducedMotion) shake = 0.25;
     WL.Audio.sfx('hurt'); burst(p.x + 10, p.y + 14, '#ff4d6d', 12);
     if (p.hp <= 0) { S.state = 'dead'; S.endT = 0; burst(p.x + 10, p.y + 14, p.ch.color, 40, 300); WL.Audio.sfx('boom'); }
   }
@@ -189,7 +195,13 @@ WL.Game = (function () {
       p.vy = Math.min(p.vy + 1800 * dt, 900);
       moveX(p, p.vx * dt); moveY(p, p.vy * dt);
       if (p.y > ROWS * T + 60) { p.inv = 0; hurtPlayer(p, p.x); if (S.state === 'play') { p.x = p.safe.x; p.y = p.safe.y; p.vx = p.vy = 0; p.inv = 1.5; } }
-      if (p.onGround && (p.safeT -= dt) <= 0) { var sx = Math.floor((p.x + p.w / 2) / T); if (tile(sx - 1, GROUND) && tile(sx + 1, GROUND) && p.x > p.safe.x - 400) { p.safe = { x: p.x, y: p.y }; } p.safeT = 0.4; }
+      if (p.onGround && (p.safeT -= dt) <= 0) {
+        var sx = Math.floor((p.x + p.w / 2) / T);
+        var safeOk = true;
+        S.enemies.forEach(function(e) { if (e.type === 'turret' && Math.abs(p.x - e.x) < 250) safeOk = false; });
+        if (safeOk && tile(sx - 1, GROUND) && tile(sx + 1, GROUND) && p.x > p.safe.x - 400) { p.safe = { x: p.x, y: p.y }; }
+        p.safeT = 0.4;
+      }
       p.cd -= dt; p.inv -= dt; p.anim += dt * (Math.abs(p.vx) / 60);
       if (I.fire && p.cd <= 0) { p.cd = p.ch.cd; fire(p); }
       p.x = clamp(p.x, 0, S.cols * T - p.w);
@@ -242,24 +254,32 @@ WL.Game = (function () {
         var sp = Math.abs(dxp) < 320 ? 85 : 40; e.x += Math.sign(dxp) * sp * dt;
         e.y = e.y0 + Math.sin(e.t * 3) * 38 + (Math.abs(dxp) < 200 ? (p.y - e.y0) * 0.35 : 0);
       } else if (e.type === 'turret') {
-        if (near && e.cd <= 0 && S.state === 'play') { e.cd = 1.8; shootAt(e, p, 230, 0); }
+        if (near && e.cd <= 0 && S.state === 'play') { e.cd = 1.8 / [0.6, 1, 1.5][getDiff()]; shootAt(e, p, 230, 0); }
       } else if (e.type === 'boss') {
         if (!e.active && Math.abs(dxp) < 560) e.active = true;
         if (!e.active) return;
         var mid = e.arenaX + 13 * T, fast = e.hp < e.maxhp / 2;
         e.x = mid + Math.sin(e.t * (fast ? 1.2 : 0.8)) * 220 - e.w / 2;
         e.y = e.y0 + Math.sin(e.t * 1.7) * 30;
-        if (e.cd <= 0) { e.cd = fast ? 1.0 : 1.6; for (var f = -2; f <= 2; f++) shootAt(e, p, 210, f * 0.22); }
-        if ((e.summon -= dt) <= 0) { e.summon = fast ? 4 : 7; var d = mk('drone', e.x, e.y + 60); d.y0 = e.y + 60; S.enemies.push(d); }
+        if (e.cd <= 0) {
+          e.cd = (fast ? 1.0 : 1.6) / [0.6, 1, 1.5][getDiff()];
+          e.pattern = 1 - (e.pattern || 0);
+          if (e.pattern === 0) {
+            for (var f = -2; f <= 2; f++) shootAt(e, p, 210, f * 0.22);
+          } else {
+            for (var f = -1.5; f <= 1.5; f++) shootAt(e, p, 210, f * 0.22);
+          }
+        }
+        if ((e.summon -= dt) <= 0) { e.summon = (fast ? 4 : 7) / [0.6, 1, 1.5][getDiff()]; var d = mk('drone', e.x, e.y + 60); d.y0 = e.y + 60; S.enemies.push(d); }
       }
-      if (S.state === 'play' && hit(p, e)) hurtPlayer(p, e.x + e.w / 2);
+      if (S.state === 'play' && hit(p, e)) hurtPlayer(p, e.x + e.w / 2, [1, 1, 2][getDiff()]);
     });
     S.enemies = S.enemies.filter(function (e) { return !e.dead; });
     // enemy bullets
     S.ebullets.forEach(function (b) {
       b.x += b.vx * dt; b.y += b.vy * dt; b.life -= dt;
       if (b.life <= 0 || tile(Math.floor(b.x / T), Math.floor(b.y / T)) === 1) b.dead = true;
-      else if (S.state === 'play' && hit(p, { x: b.x - 5, y: b.y - 5, w: 10, h: 10 })) { b.dead = true; hurtPlayer(p, b.x); }
+      else if (S.state === 'play' && hit(p, { x: b.x - 5, y: b.y - 5, w: 10, h: 10 })) { b.dead = true; hurtPlayer(p, b.x, [1, 1, 2][getDiff()]); }
     });
     S.bullets = S.bullets.filter(function (b) { return !b.dead; });
     S.ebullets = S.ebullets.filter(function (b) { return !b.dead; });
@@ -407,6 +427,14 @@ WL.Game = (function () {
       cx.strokeStyle = '#ff4d6d'; S.enemies.forEach(function (e) { cx.strokeRect(e.x, e.y, e.w, e.h); }); cx.strokeRect(S.goal.x, S.goal.y, S.goal.w, S.goal.h);
     }
     S.parts.forEach(function (q) { cx.globalAlpha = Math.min(1, q.life * 2); cx.fillStyle = q.color; cx.fillRect(q.x, q.y, q.size, q.size); }); cx.globalAlpha = 1;
+    if (location.search.indexOf('debug=1') > -1) {
+      cx.strokeStyle = '#0f0'; cx.lineWidth = 1;
+      cx.strokeRect(p.x, p.y, p.w, p.h);
+      S.enemies.forEach(function(e) { cx.strokeRect(e.x, e.y, e.w, e.h); });
+      S.bullets.forEach(function(b) { cx.strokeRect(b.x - b.r, b.y - b.r, b.r * 2, b.r * 2); });
+      S.ebullets.forEach(function(b) { cx.strokeRect(b.x - 5, b.y - 5, 10, 10); });
+      cx.strokeRect(S.goal.x, S.goal.y, S.goal.w, S.goal.h);
+    }
     cx.restore();
     // glitch overlay
     if (!reducedMotion && spec.glitch && Math.random() < 0.06 * spec.glitch) { for (var gi = 0; gi < 3; gi++) { cx.fillStyle = Math.random() < 0.5 ? 'rgba(255,0,200,.18)' : 'rgba(0,255,230,.18)'; cx.fillRect(0, Math.random() * H, W, 4 + Math.random() * 14); } }
@@ -427,6 +455,10 @@ WL.Game = (function () {
     cx.fillStyle = '#fff'; cx.textAlign = 'center'; cx.fillText(txt, W / 2, 30);
     if (S.state === 'win') { cx.font = 'bold 56px system-ui'; cx.fillStyle = '#ffd23f'; cx.fillText('LEVEL CLEAR!', W / 2, H / 2); }
     if (S.state === 'dead') { cx.font = 'bold 56px system-ui'; cx.fillStyle = '#ff4d6d'; cx.fillText('GLITCHED OUT', W / 2, H / 2); }
+    if (location.search.indexOf('debug=1') > -1 && S) {
+      cx.font = '14px monospace'; cx.fillStyle = '#0f0'; cx.textAlign = 'left';
+      cx.fillText('FPS: ' + Math.round(S.fps || 0) + ' | Seed: ' + S.spec.seed, 16, 74);
+    }
     cx.textAlign = 'left';
   }
 
@@ -436,6 +468,7 @@ WL.Game = (function () {
     var rawDt = Math.min(0.05, (ts - last) / 1000 || 0); last = ts; tAll += rawDt;
     if (WL.Dev) WL.Dev.frame(rawDt * 1000);
     var dt = rawDt * (WL.Dev ? WL.Dev.flags.timeScale : 1);
+    if (location.search.indexOf('debug=1') > -1 && S) S.fps = rawDt ? 1 / rawDt : 0;
     WL.Input.update();
     if (WL.UI && WL.UI.nav) WL.UI.nav();
     if (running && !paused) {

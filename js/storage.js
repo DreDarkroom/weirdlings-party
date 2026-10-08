@@ -24,7 +24,7 @@ WL.Storage = (function () {
   function getDefault() {
     return {
       version: VERSION,
-      save: { charId: 'dee', unlocked: 0, part1Done: false },
+      save: { charId: 'dee', unlocked: 0, part1Done: false, diff: 1 },
       audio: { music: 0.6, sfx: 0.8 },
       spotify: '',
       stats: { kills: 0, vinyl: 0, bestTimes: [] }
@@ -80,6 +80,7 @@ WL.Storage = (function () {
         if (obj.save.charId === undefined) obj.save.charId = def.save.charId;
         if (obj.save.unlocked === undefined) obj.save.unlocked = def.save.unlocked;
         if (obj.save.part1Done === undefined) obj.save.part1Done = def.save.part1Done;
+        if (obj.save.diff === undefined) obj.save.diff = def.save.diff;
       }
 
       if (!obj.audio) obj.audio = def.audio;
