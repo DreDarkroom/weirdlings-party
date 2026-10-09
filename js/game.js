@@ -87,7 +87,7 @@ WL.Game = (function () {
     var boss = null;
     if (spec.boss) {
       var ax = spec.cols + 2;
-      boss = mk('boss', (ax + 12) * T, 130);
+      boss = mk('boss', (ax + 12) * T, 200);
       enemies.push(boss);
       boss.arenaX = ax * T;
     }
@@ -108,7 +108,7 @@ WL.Game = (function () {
     if (type === 'walker') obj = Object.assign(base, { w: 26, h: 28, hp: 3, vx: -55, pts: 100 });
     else if (type === 'drone') obj = Object.assign(base, { w: 28, h: 22, hp: 2, y0: y, pts: 80 });
     else if (type === 'turret') obj = Object.assign(base, { w: 28, h: 28, hp: 4, pts: 150 });
-    else obj = Object.assign(base, { w: 92, h: 78, hp: 40, maxhp: 40, pts: 1000, y0: y, active: false, summon: 4, pattern: 0 });
+    else obj = Object.assign(base, { w: 92, h: 78, hp: 24, maxhp: 24, pts: 1000, y0: y, active: false, summon: 4, pattern: 0 });
     obj.hp = Math.max(1, Math.floor(obj.hp * [0.6, 1, 1.5][getDiff()]));
     if (obj.maxhp) obj.maxhp = obj.hp;
     return obj;
@@ -147,6 +147,18 @@ WL.Game = (function () {
     var cols = ['#ff4fd8', '#38f2c1', '#ffd23f', '#8b5cf6', '#f43f5e'];
     for (var i = 0; i < n; i++) S.parts.push({ x: Math.random() * W + (S.cam || 0), y: -10 - Math.random() * 200, vx: (Math.random() - 0.5) * 60, vy: 60 + Math.random() * 120, life: 4 + Math.random() * 3, color: cols[i % 5], size: 3 + Math.random() * 4, g: 0 });
   }
+  // Aim assist: pull the shot toward the closest enemy within ~32 degrees of where you're aiming.
+  function assistAim(a, ox, oy) {
+    var best = 0.56, pick = null;
+    S.enemies.forEach(function (e) {
+      if (e.dead) return;
+      var ex = e.x + e.w / 2 - ox, ey = e.y + e.h / 2 - oy, dist = Math.hypot(ex, ey);
+      if (dist < 24 || dist > 640) return;
+      var ang = Math.atan2(ey, ex), d = Math.atan2(Math.sin(ang - a), Math.cos(ang - a));
+      if (Math.abs(d) < best) { best = Math.abs(d); pick = d; }
+    });
+    return pick === null ? a : a + pick * 0.9;
+  }
   function fire(p) {
     var ch = p.ch, I = WL.Input.held, dx = p.face, dy = 0;
     if (I.up) { dy = -1; if (!I.left && !I.right) dx = 0; }
@@ -157,10 +169,11 @@ WL.Game = (function () {
       S.bullets.push(Object.assign({ x: ox, y: oy, vx: c * sp, vy: s * sp, t: 0, life: 0.85, dmg: 1, r: 5, color: ch.color, hits: [] }, extra || {}));
     }
     var a = Math.atan2(dy, dx);
+    a = assistAim(a, ox, oy);
     if (ch.shot === 'forget') { var q = Math.random(); if (q < 0.1) { WL.UI.say('…wait, what was I doing?'); return; } if (q < 0.4) { bullet(a - 0.22); bullet(a); bullet(a + 0.22); } else bullet(a); }
     else if (ch.shot === 'pierce') bullet(a, { pierce: true, r: 7, color: '#e0f7ff' });
     else if (ch.shot === 'big') bullet(a, { dmg: 2, r: 11, life: 0.7 });
-    else if (ch.shot === 'helix') { var ax = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y'; bullet(a, { hv: true, ph: 0, axis: ax, r: 4 }); bullet(a, { hv: true, ph: Math.PI, axis: ax, r: 4, color: '#fff' }); }
+    else if (ch.shot === 'helix') { var ax = Math.abs(Math.cos(a)) >= Math.abs(Math.sin(a)) ? 'x' : 'y'; bullet(a, { hv: true, ph: 0, axis: ax, r: 4 }); bullet(a, { hv: true, ph: Math.PI, axis: ax, r: 4, color: '#fff' }); }
     else bullet(a);
     WL.Audio.sfx('shoot');
   }
@@ -231,6 +244,10 @@ WL.Game = (function () {
         if (e.dead || b.dead || (b.hits.indexOf(e) >= 0)) return;
         if (b.x > e.x - b.r && b.x < e.x + e.w + b.r && b.y > e.y - b.r && b.y < e.y + e.h + b.r) {
           e.hp -= b.dmg; e.flash = 0.1; WL.Audio.sfx('hit'); burst(b.x, b.y, '#fff', 4, 120);
+          if (e.type === 'boss') {   // boss drops a heart at 2/3 and 1/3 health so the fight is winnable
+            e.heals = e.heals || 0;
+            while (e.heals < 2 && e.hp > 0 && e.hp / e.maxhp < 1 - (e.heals + 1) / 3) { e.heals++; S.items.push({ type: 'heart', x: S.player.x + (S.player.face > 0 ? 60 : -60), y: GROUND * T - 30 }); WL.UI.say('The Overfit shed a heart!'); }
+          }
           if (e.type === 'boss' && !e.active) e.active = true;
           if (b.pierce) b.hits.push(e); else b.dead = true;
           if (e.hp <= 0) killEnemy(e);
@@ -260,9 +277,13 @@ WL.Game = (function () {
         if (!e.active) return;
         var mid = e.arenaX + 13 * T, fast = e.hp < e.maxhp / 2;
         e.x = mid + Math.sin(e.t * (fast ? 1.2 : 0.8)) * 220 - e.w / 2;
-        e.y = e.y0 + Math.sin(e.t * 1.7) * 30;
+        // Dive: every few seconds the Overfit drops to player height so ordinary horizontal shots connect.
+        e.diveCd = (e.diveCd == null ? 4 : e.diveCd) - dt;
+        if (e.diveT > 0) e.diveT -= dt; else if (e.diveCd <= 0) { e.diveT = 2.6; e.diveCd = fast ? 6 : 8; }
+        var ty = e.diveT > 0 ? 326 : e.y0 + Math.sin(e.t * 1.7) * 30;
+        e.y += (ty - e.y) * Math.min(1, dt * 3);
         if (e.cd <= 0) {
-          e.cd = (fast ? 1.0 : 1.6) / [0.6, 1, 1.5][getDiff()];
+          e.cd = (fast ? 1.3 : 2.0) / [0.6, 1, 1.5][getDiff()];
           e.pattern = 1 - (e.pattern || 0);
           if (e.pattern === 0) {
             for (var f = -2; f <= 2; f++) shootAt(e, p, 210, f * 0.22);
