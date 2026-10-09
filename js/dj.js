@@ -46,7 +46,7 @@ WL.DJ = (function () {
   };
   Deck.prototype.load = function (track) {
     var self = this; self.pause(); self.loop = null;
-    return WL.Audio.client.load(track).then(function (b) {
+    return WL.Audio.load(track).then(function (b) {
       self.buf = b; self.track = track; self.offset = 0; self.cue = 0; self.rate = 1;
       var d = b.getChannelData(0), n = 600, step = Math.floor(d.length / n), pk = new Float32Array(n);
       for (var i = 0; i < n; i++) { var m = 0; for (var j = 0; j < step; j += 64) m = Math.max(m, Math.abs(d[i * step + j])); pk[i] = m; }

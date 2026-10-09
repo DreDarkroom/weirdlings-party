@@ -267,7 +267,7 @@ WL.UI = (function () {
     if (WL.Input.padName) toast('🎮 Controller ready');
   }
   function init() {
-    bind(); WL.Input.bindTouch(); WL.Wishes.bind(); WL.Dev.init(); WL.Music.init(); show('title', false);
+    bind(); WL.Input.bindTouch(); WL.Wishes.bind(); WL.Dev.init(); WL.Music.init(); WL.Party.init(); show('title', false);
     fetch('content/story.json', { cache: 'no-cache' }).then(function (r) { return r.json(); }).then(mergeStory).catch(function () {});
     WL.Lab.loadManifest();
   }

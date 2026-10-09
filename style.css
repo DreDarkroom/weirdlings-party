@@ -188,3 +188,32 @@ code{background:#000;padding:0 5px;border-radius:4px;color:var(--acc2)}
 
 /* up-aim button for touch (boss + flying enemies) */
 #touch .u{font-size:26px;background:#60a5fa33}
+
+/* ======== PARTY MODE (body.party, switched on by the party clock) ======== */
+.partyonly{display:none!important}
+body.party .partyonly,body.dev .partyonly{display:flex!important}
+#fxLayer{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:45}
+.emo{position:absolute;top:-8%;animation:emoFall 4s linear forwards;filter:drop-shadow(0 2px 3px #0006)}
+@keyframes emoFall{0%{transform:translateY(0) rotate(0)}100%{transform:translateY(115vh) rotate(540deg)}}
+.balloon{position:absolute;bottom:-12%;animation:balloonUp 9s ease-in forwards;opacity:.9;filter:drop-shadow(0 3px 4px #0006)}
+@keyframes balloonUp{0%{transform:translate(0,0) rotate(-6deg)}50%{transform:translate(28px,-55vh) rotate(8deg)}100%{transform:translate(-18px,-125vh) rotate(-6deg)}}
+#partyLaunch{position:fixed;inset:0;z-index:95;display:grid;place-items:center;background:radial-gradient(circle at 50% 40%,#5b0a8caa,#0b0912ee);animation:plIn .5s ease-out}
+#partyLaunch[hidden]{display:none}
+@keyframes plIn{from{opacity:0;transform:scale(1.15)}to{opacity:1;transform:none}}
+.plBox{text-align:center;padding:24px;max-width:92vw}
+.plBox h2{font-size:clamp(30px,8vw,72px);margin:.1em 0;line-height:1;background:linear-gradient(90deg,#ff4fd8,#ffd23f,#38f2c1,#60a5fa,#ff4fd8);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rainbow 2.5s linear infinite}
+.plEmoji{font-size:clamp(34px,9vw,72px);animation:wobble 1s ease-in-out infinite}
+.plBox p{font-size:clamp(16px,3.4vw,24px);margin:.3em 0}.plNote{color:var(--mute)}
+@keyframes rainbow{to{background-position:300% 0}}
+@keyframes wobble{0%,100%{transform:rotate(-5deg) scale(1)}50%{transform:rotate(5deg) scale(1.12)}}
+@keyframes hueSpin{to{filter:hue-rotate(360deg)}}
+body.party:not(.fx-off) #cdBanner{background:linear-gradient(90deg,#be185d,#7c3aed,#0891b2,#16a34a,#ca8a04,#be185d);background-size:300% 100%;animation:rainbow 9s linear infinite;box-shadow:0 0 calc(10px + 26px * var(--beat,0)) rgba(255,79,216,.8)}
+body.party:not(.fx-off) #cdBanner .cdBig{text-shadow:0 0 calc(8px + 22px * var(--beat,0)) #fff}
+body.party:not(.fx-off) #musicBar{box-shadow:inset 0 -2px calc(2px + 10px * var(--beat,0)) rgba(56,242,193,.7)}
+body.party:not(.fx-off) h1 span{background:linear-gradient(90deg,#ff4fd8,#ffd23f,#38f2c1,#60a5fa,#ff4fd8);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rainbow 4s linear infinite}
+body.party.fx-wild h1{display:inline-block;animation:wobble 2.4s ease-in-out infinite}
+body.party.fx-wild #title .menu button:hover{animation:wobble .4s ease-in-out infinite}
+body.party.fx-wild .panel{transform:scale(calc(1 + 0.004 * var(--beat,0)))}
+body.party.fx-wild #game{filter:saturate(1.25) contrast(1.04)}
+body.party.fx-wild .slot.live{animation:wobble 1.4s ease-in-out infinite}
+body.party.fx-off *{animation-play-state:running}

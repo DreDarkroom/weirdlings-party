@@ -124,5 +124,6 @@ WL.Music = (function () {
     ensureTracks().then(function () { render(); if (started) apply(); });
     render();
   }
-  return { init: init, start: start, context: context, suspend: suspend, resume: resume, toggle: toggle, next: function () { advance(1); }, state: st, get current() { return curId; } };
+  function refresh() { if (started && st.on && !suspended() && curId) play(curId); }
+  return { byId: byId, refresh: refresh, init: init, start: start, context: context, suspend: suspend, resume: resume, toggle: toggle, next: function () { advance(1); }, state: st, get current() { return curId; } };
 })();

@@ -186,6 +186,7 @@ WL.Game = (function () {
     if (p.hp <= 0) { S.state = 'dead'; S.endT = 0; burst(p.x + 10, p.y + 14, p.ch.color, 40, 300); WL.Audio.sfx('boom'); }
   }
   function killEnemy(e) {
+    if (WL.Party) WL.Party.onKill(S, e);
     e.dead = true; S.score += e.pts; S.kills++; WL.Audio.sfx('boom'); burst(e.x + e.w / 2, e.y + e.h / 2, e.type === 'boss' ? '#ffd23f' : '#ff7a59', e.type === 'boss' ? 80 : 18, e.type === 'boss' ? 400 : 220);
     if (Math.random() < 0.18 && e.type !== 'boss') S.items.push({ type: 'heart', x: e.x, y: e.y });
     if (e.type === 'boss') { S.goal.open = true; if (!reducedMotion) shake = 0.8; WL.UI.say('The Overfit overheated! The gate to the party is open!'); }
@@ -195,6 +196,7 @@ WL.Game = (function () {
   function update(dt) {
     var p = S.player, I = WL.Input.held, P = WL.Input.pressed;
     S.time += dt;
+    if (WL.Party) WL.Party.tick(S, dt);
     if (S.state === 'play') {
       var dir = (I.right ? 1 : 0) - (I.left ? 1 : 0);
       if (dir) p.face = dir;
@@ -399,7 +401,7 @@ WL.Game = (function () {
     cx.fillStyle = '#2b1b3d'; cx.fillRect(s.x + 14, s.y - 70, 6, 70); cx.fillRect(s.x + 130, s.y - 70, 6, 70);
     cx.fillStyle = '#12091f'; cx.fillRect(s.x, s.y - 128, 150, 60);
     cx.strokeStyle = S.spec.neon; cx.lineWidth = 3; cx.strokeRect(s.x, s.y - 128, 150, 60);
-    cx.fillStyle = '#fff'; cx.textAlign = 'center'; cx.font = 'bold 12px system-ui,sans-serif'; cx.fillText('DJ CAKE CUT IN', s.x + 75, s.y - 108);
+    cx.fillStyle = '#fff'; cx.textAlign = 'center'; cx.font = 'bold 12px system-ui,sans-serif'; cx.fillText('PARTY STARTS IN', s.x + 75, s.y - 108);
     cx.fillStyle = S.spec.neon; cx.font = 'bold 20px monospace'; cx.fillText(WL.Countdown.text(), s.x + 75, s.y - 82);
     cx.fillStyle = '#9a90b8'; cx.font = '10px system-ui'; cx.fillText('(hey Dee. yes, you.)', s.x + 75, s.y - 71);
     cx.textAlign = 'left';
@@ -418,6 +420,7 @@ WL.Game = (function () {
     cx.setTransform(scaleK, 0, 0, scaleK, 0, 0);
     if (shake > 0) cx.translate((Math.random() - 0.5) * shake * 24, (Math.random() - 0.5) * shake * 24);
     sky(spec, cam, t);
+    if (WL.Party) WL.Party.drawBack(cx, W, H, cam);
     if (!S) return;
     cx.save(); cx.translate(-Math.floor(cam), 0);
     var c0 = Math.floor(cam / T), c1 = c0 + W / T + 2;
@@ -438,15 +441,17 @@ WL.Game = (function () {
       if (it.type === 'vinyl') { cx.fillStyle = '#111'; cx.beginPath(); cx.arc(it.x + 8, it.y + 8 + yb, 8, 0, 6.283); cx.fill(); cx.fillStyle = '#ff4fd8'; cx.beginPath(); cx.arc(it.x + 8, it.y + 8 + yb, 3, 0, 6.283); cx.fill(); cx.strokeStyle = '#fff5'; cx.beginPath(); cx.arc(it.x + 8, it.y + 8 + yb, 6, 0.3, 1.5); cx.stroke(); }
       else { cx.fillStyle = '#ff4d6d'; cx.font = '20px sans-serif'; cx.fillText('♥', it.x, it.y + 16 + yb); }
     });
-    S.enemies.forEach(function (e) { if (e.x > cam - 150 && e.x < cam + W + 150) drawEnemy(e, t); });
+    S.enemies.forEach(function (e) { if (e.x > cam - 150 && e.x < cam + W + 150) { drawEnemy(e, t); if (WL.Party) WL.Party.dressEnemy(cx, e); } });
     var p = S.player;
     if (S.state !== 'dead') drawPerson(p.x, p.y, p.w, p.h, p.face, p.ch, p.anim, Math.abs(p.vx) > 20 && p.onGround, p.inv > 0 && Math.floor(t * 20) % 2 ? 0.4 : 1);
-    S.bullets.forEach(function (b) { cx.fillStyle = b.color; cx.beginPath(); cx.arc(b.x, b.y, b.r, 0, 6.283); cx.fill(); cx.globalAlpha = 0.3; cx.beginPath(); cx.arc(b.x - b.vx * 0.02, b.y - b.vy * 0.02, b.r * 1.6, 0, 6.283); cx.fill(); cx.globalAlpha = 1; });
+    if (WL.Party && S.state !== 'dead') WL.Party.dressPlayer(cx, p);
+    S.bullets.forEach(function (b) { cx.fillStyle = (WL.Party && WL.Party.level() !== 'off') ? WL.Party.bulletColor(b) : b.color; cx.beginPath(); cx.arc(b.x, b.y, b.r, 0, 6.283); cx.fill(); cx.globalAlpha = 0.3; cx.beginPath(); cx.arc(b.x - b.vx * 0.02, b.y - b.vy * 0.02, b.r * 1.6, 0, 6.283); cx.fill(); cx.globalAlpha = 1; });
     S.ebullets.forEach(function (b) { cx.fillStyle = '#ff2e63'; cx.beginPath(); cx.arc(b.x, b.y, 5, 0, 6.283); cx.fill(); cx.strokeStyle = '#fff'; cx.lineWidth = 1; cx.stroke(); });
     if (WL.Dev && WL.Dev.flags.hitboxes) {
       cx.lineWidth = 1; cx.strokeStyle = '#38f2c1'; cx.strokeRect(p.x, p.y, p.w, p.h);
       cx.strokeStyle = '#ff4d6d'; S.enemies.forEach(function (e) { cx.strokeRect(e.x, e.y, e.w, e.h); }); cx.strokeRect(S.goal.x, S.goal.y, S.goal.w, S.goal.h);
     }
+    if (WL.Party) WL.Party.drawWorld(cx);
     S.parts.forEach(function (q) { cx.globalAlpha = Math.min(1, q.life * 2); cx.fillStyle = q.color; cx.fillRect(q.x, q.y, q.size, q.size); }); cx.globalAlpha = 1;
     if (location.search.indexOf('debug=1') > -1) {
       cx.strokeStyle = '#0f0'; cx.lineWidth = 1;
@@ -469,7 +474,7 @@ WL.Game = (function () {
     cx.fillText(p.ch.name + ' · ' + S.spec.name, 16, 54);
     cx.textAlign = 'right'; cx.fillText('SCORE ' + S.score + '   ● ' + S.vinyl, W - 12, 24);
     // countdown plate
-    var txt = 'DJ CAKE: ' + WL.Countdown.text();
+    var txt = 'PARTY: ' + WL.Countdown.text();
     cx.font = 'bold 18px monospace'; var tw = cx.measureText(txt).width + 24;
     cx.fillStyle = 'rgba(18,9,31,.8)'; cx.fillRect(W / 2 - tw / 2, 8, tw, 32);
     cx.strokeStyle = S.spec.neon; cx.lineWidth = 2; cx.strokeRect(W / 2 - tw / 2, 8, tw, 32);
@@ -488,6 +493,7 @@ WL.Game = (function () {
     requestAnimationFrame(frame);
     var rawDt = Math.min(0.05, (ts - last) / 1000 || 0); last = ts; tAll += rawDt;
     if (WL.Dev) WL.Dev.frame(rawDt * 1000);
+    if (WL.Party) WL.Party.frame(rawDt);
     var dt = rawDt * (WL.Dev ? WL.Dev.flags.timeScale : 1);
     if (location.search.indexOf('debug=1') > -1 && S) S.fps = rawDt ? 1 / rawDt : 0;
     WL.Input.update();

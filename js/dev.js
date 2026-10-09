@@ -89,6 +89,10 @@ WL.Dev = (function () {
     g.appendChild(row([btn('After the party', function () { WL.Countdown.setOffset(sl[sl.length - 1].endMs - Date.now() + 60000); }), btn('Reset to real time', function () { WL.Countdown.setOffset(0); })]));
     root.appendChild(g);
 
+    g = group('Party mode (auto-starts at 7pm UK)');
+    g.appendChild(row([btn('Preview ON', function () { WL.Party.force(true); }), btn('Preview OFF', function () { WL.Party.force(false); }), btn('Replay launch show', function () { WL.Party.launch(); }), btn('Fireworks 🎉', function () { WL.Party.rain(['🎉', '🎂', '🪩', '🤖', '🎈'], 40); })]));
+    root.appendChild(g);
+
     g = group('Progress + data');
     g.appendChild(row([btn('Unlock Part 2', function () { WL.UI.devSet({ part1Done: true, unlocked: 3 }); }), btn('Lock Part 2', function () { WL.UI.devSet({ part1Done: false, unlocked: 0 }); }), btn('Clear wishes (this device)', function () { try { localStorage.removeItem('wl.wishes.v1'); WL.UI.toast('Local wishes cleared'); } catch (e) {} }), btn('Reset everything', function () { if (confirm('Wipe all saved data?')) { try { localStorage.clear(); } catch (e) {} location.reload(); } })]));
     root.appendChild(g);

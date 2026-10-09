@@ -7,7 +7,7 @@ WL.Lab.register({
     g.fillStyle = '#fff'; g.font = '18px system-ui'; g.fillText('Baking track…', 20, 40);
     WL.Audio.client.find('kerry-birthday-anthem').then(function (tr) {
       spb = 60 / tr.bpm;
-      return WL.Audio.client.load(tr);
+      return WL.Audio.load(tr);
     }).then(function (buf) {
       if (!alive) return;
       src = ctx.createBufferSource(); src.buffer = buf; src.loop = true; src.connect(WL.Audio.musicGain);

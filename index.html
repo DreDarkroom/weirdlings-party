@@ -38,6 +38,8 @@
   <div id="toast" role="status"></div>
   <div id="rotate">↻ Rotate your device to landscape for the best view<br><small>Party starts in <span class="cd"></span></small></div>
   <div id="devHud" hidden aria-hidden="true"></div>
+  <div id="fxLayer" aria-hidden="true"></div>
+  <div id="partyLaunch" hidden role="alert"><div class="plBox"><div class="plEmoji">🪩🎉🎂🎉🪩</div><h2>THE PARTY HAS STARTED!</h2><p id="plSub"></p><p class="plNote">Deluxe sound + party mode are now ON</p><button id="plGo" class="primary">LET'S GO 🥳</button></div></div>
 
   <div id="hudBtns">
     <button id="btnPause" aria-label="Pause">⏸</button>
@@ -112,6 +114,8 @@
       <label>Difficulty <select id="setDiff"><option value="0">Chill</option><option value="1">Normal</option><option value="2">Tribe-Hard</option></select></label>
       <label>Dee's memory <input type="range" min="0" max="100" value="3" disabled title="Party starts in the banner above, Dee"></label>
       <p class="hint">Dee's memory is stuck at 3% (not adjustable). Reminder: <b class="cd"></b> until the party.</p>
+      <label class="partyonly">Party effects <select id="setFx"><option value="wild">Wild 🤪</option><option value="chill">Chill 😎</option><option value="off">Off</option></select></label>
+      <label class="partyonly">Audio quality <select id="setHq"><option value="auto">Auto (Deluxe at party time)</option><option value="deluxe">Deluxe (stereo party mix)</option><option value="standard">Standard</option></select></label>
       <label class="chk"><input id="setDev" type="checkbox"> 🛠 Developer mode (performance HUD, test tools, lab)</label>
       <div class="menu row"><button id="btnResetAll" class="danger">Reset all data</button><button data-back>Back</button></div>
       <p class="whisper" aria-hidden="true">psst — Dee — party in <span class="cd"></span></p>
@@ -310,6 +314,7 @@
 <script src="js/wishes.js"></script>
 <script src="js/lab.js"></script>
 <script src="js/music.js"></script>
+<script src="js/party.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/main.js"></script>
 <script>document.getElementById('ver').textContent = WL.CONFIG.version;</script>
